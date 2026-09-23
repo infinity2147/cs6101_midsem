@@ -4,7 +4,7 @@ Re-implementation, reproduction and extensions of
 **DyVo** (Nguyen, Chatterjee, MacAvaney, Mackie, Dalton, Yates — EMNLP 2024).
 Reference code: <https://github.com/thongnt99/DyVo>.
 
-➡️ **Mid-semester report:** [`report/MIDSEM_REPORT.md`](report/MIDSEM_REPORT.md)
+**Mid-semester report:** [`report/MIDSEM_REPORT.md`](report/MIDSEM_REPORT.md) (web version: `report/midsem_report.html`)
 (results tables: [`report/results/tables.md`](report/results/tables.md))
 
 ## What DyVo does (one paragraph)
@@ -46,5 +46,6 @@ pip install -r requirements.txt
 # downloads: DistilBERT + monoT5-base (legacy HF S3), SQuAD v1.1, Wikipedia2Vec enwiki_20180420_100d
 bash scripts/download.sh
 python -m dyvo.w2v --src data/w2v/enwiki_20180420_100d.txt.bz2 --out data/w2v/converted
-bash scripts/run_squad_experiments.sh        # ~5-6 h on 4 CPU cores (bf16), much faster on a GPU
+bash scripts/run_cpu_budget.sh               # exactly what produced the mid-sem numbers (~5 h, 4 CPU cores)
+# scripts/run_squad_experiments.sh is the longer full-budget version
 ```

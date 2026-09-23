@@ -16,7 +16,8 @@
 >    (+2.1 over ungated, p < 0.001; unchanged under 3× more noise), mostly by pruning entities.
 > 4. **Ext-B (dynamic vocabulary)**: on queries with entities never seen in training, DyVo beats
 >    LSR-w by **+1.8 (p = 0.009)**, and removing those entities from the vocabulary removes the gain
->    (p = 0.002). This is direct evidence for the paper's central "dynamic" claim.
+>    (p = 0.002); a static *learned* entity table loses 1.5 on the same queries (p = 0.027). This is direct
+>    evidence for the paper's central "dynamic" claim.
 > 5. The paper-scale run on Robust04/Core18/CODEC is fully scripted (`configs/paper_datasets.md`)
 >    and needs licensed data plus a GPU.
 
@@ -160,6 +161,15 @@ query entity is almost always linked somewhere in a relevant document. Both poin
 **candidate generator, not the DyVo head, as the main reason our aggregate numbers differ**. The
 paper's own Table 2 makes the same point: candidate quality (REL → Mixtral → GPT-4) drives nDCG.
 
+#### Entity embeddings (paper Table 3 analogue)
+
+| Model | nDCG@10 | nDCG@20 | R@100 | R@1k | MRR@10 | doc words/ents \| q words/ents \| FLOPs |
+|---|---|---|---|---|---|---|
+| Wikipedia2Vec (100d, frozen, projected) | 77.75 | 78.73 | 97.65 | 99.10 | 73.90 | 102 / 7.4 | 10.6 / 0.7 | 3.21 |
+| Static learned table (Ext-B control) | 76.67‡ | 77.83 | 97.20 | 98.85 | 72.76 | 95 / 5.8 | 8.8 / 0.6 | 1.81 |
+
+(The Token-Aggregation variant is implemented, `--ent_emb tokaggr`, and scheduled for the end-sem runs.)
+
 #### Candidate source (paper Table 2 analogue)
 
 | Model | nDCG@10 | nDCG@20 | R@100 | R@1k | MRR@10 | doc words/ents \| q words/ents \| FLOPs |
@@ -238,9 +248,9 @@ fixed-vocabulary entity model.
 
 | Query group | #q | LSR-w | DyVo (frozen W2V, dynamic) | DyVo (static learned table) |
 |---|---|---|---|---|
-| no entity linked | 900 | 73.12 | 72.09 | – |
-| all entities seen in training | 646 | 80.24 | 78.33 | – |
-| >=1 unseen entity | 454 | 86.29 | 88.13 | – |
+| no entity linked | 900 | 73.12 | 72.09 | 70.89 |
+| all entities seen in training | 646 | 80.24 | 78.33 | 77.77 |
+| >=1 unseen entity | 454 | 86.29 | 88.13 | 86.59 |
 
 Test-time vocabulary restriction of the same DyVo model (entities never seen in training removed from the index = a static vocabulary):
 
@@ -253,8 +263,6 @@ On >=1-unseen-entity queries: dynamic vs static p=0.0017; DyVo vs LSR-w p=0.0094
 
 16686 distinct entities seen in training; 420 distinct test-query entities unseen.
 
-† / ‡ : significantly better / worse than LSR-w (paired t-test on nDCG@10, p<0.05).
-
 **Reading.**
 * On the 454 test queries that contain at least one entity **never seen in training**, DyVo
   beats LSR-w by **+1.84 nDCG@10 (p = 0.009)**, the largest gain of any group.
@@ -263,6 +271,11 @@ On >=1-unseen-entity queries: dynamic vs static p=0.0017; DyVo vs LSR-w p=0.0094
 * So the benefit comes specifically from entities added "for free" through frozen external
   embeddings. That is direct evidence for the paper's dynamic-vocabulary claim, which the paper
   itself argues for but does not isolate.
+* **Training-time control (frozen external vs static learned entity table).** The same model with
+  a *trainable, randomly initialised* entity table (what a fixed-vocabulary entity model does)
+  reaches only 86.59 on the unseen-entity queries, **−1.54 vs frozen Wikipedia2Vec (p = 0.027)**.
+  Overall it falls to 76.67, significantly below both frozen DyVo (−1.07, p = 0.009) and LSR-w.
+  Both controls point the same way: the external, frozen embedding space is what makes new entities usable.
 * Interestingly, queries whose entities were all seen in training do *not* gain (78.33 vs 80.24).
   Seen entities are mostly frequent ones (countries, cities), which discriminate little between
   paragraphs, while rare unseen entities are highly specific. This is exactly where word pieces

@@ -22,6 +22,7 @@
 | Model | nDCG@10 | nDCG@20 | R@100 | R@1k | MRR@10 | doc words/ents \| q words/ents \| FLOPs |
 |---|---|---|---|---|---|---|
 | Wikipedia2Vec (100d, frozen, projected) | 77.75 | 78.73 | 97.65 | 99.10 | 73.90 | 102 / 7.4 | 10.6 / 0.7 | 3.21 |
+| Static learned table (Ext-B control) | 76.67‡ | 77.83 | 97.20 | 98.85 | 72.76 | 95 / 5.8 | 8.8 / 0.6 | 1.81 |
 
 ### Candidate quality
 
@@ -44,9 +45,9 @@
 
 | Query group | #q | LSR-w | DyVo (frozen W2V, dynamic) | DyVo (static learned table) |
 |---|---|---|---|---|
-| no entity linked | 900 | 73.12 | 72.09 | – |
-| all entities seen in training | 646 | 80.24 | 78.33 | – |
-| >=1 unseen entity | 454 | 86.29 | 88.13 | – |
+| no entity linked | 900 | 73.12 | 72.09 | 70.89 |
+| all entities seen in training | 646 | 80.24 | 78.33 | 77.77 |
+| >=1 unseen entity | 454 | 86.29 | 88.13 | 86.59 |
 
 Test-time vocabulary restriction of the same DyVo model (entities never seen in training removed from the index = a static vocabulary):
 

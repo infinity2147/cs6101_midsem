@@ -1,0 +1,249 @@
+<title>DyVo Mid-Sem Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#f6f7f4; --panel:#ffffff; --ink:#18201c; --ink-2:#4d5752; --muted:#7a847e; --rule:#dfe3dd;
+  --accent:#0f6b5c; --accent-soft:#e2efeb; --warn:#a24b2f; --warn-soft:#f6e6df;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --grid:#e6e8e3;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#141816; --panel:#1b201d; --ink:#eef1ee; --ink-2:#b9c1bc; --muted:#8a948e; --rule:#2c332f;
+    --accent:#5cc3ad; --accent-soft:#1d302b; --warn:#e58a6b; --warn-soft:#352420;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --grid:#262c29;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#141816; --panel:#1b201d; --ink:#eef1ee; --ink-2:#b9c1bc; --muted:#8a948e; --rule:#2c332f;
+  --accent:#5cc3ad; --accent-soft:#1d302b; --warn:#e58a6b; --warn-soft:#352420;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --grid:#262c29;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15px/1.6 var(--sans);padding-inline:20px;padding-block:32px 64px}
+.wrap{max-width:960px;margin:0 auto;display:grid;gap:40px}
+header{display:grid;gap:10px;border-bottom:1px solid var(--rule);padding-bottom:28px}
+.eyebrow{font:500 12px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+h1{font:650 clamp(28px,4.4vw,42px)/1.12 var(--serif);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h2{font:650 24px/1.25 var(--serif);margin:0 0 4px;text-wrap:balance}
+h3{font:600 15px/1.4 var(--sans);margin:18px 0 6px}
+p{margin:0 0 12px;max-width:68ch}
+.sub{color:var(--ink-2);max-width:70ch;margin:0}
+.meta{font:13px/1.5 var(--mono);color:var(--muted)}
+code,.term{font-family:var(--mono);font-size:.88em}
+.term{background:var(--accent-soft);color:var(--accent);padding:1px 6px;border-radius:3px;white-space:nowrap}
+section{display:grid;gap:14px}
+.findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.finding{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:16px 18px;display:grid;gap:6px;align-content:start}
+.finding .k{font:500 11px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.finding .v{font:650 26px/1.1 var(--serif);font-variant-numeric:tabular-nums}
+.finding .v.pos{color:var(--accent)} .finding .v.neg{color:var(--warn)}
+.finding p{margin:0;font-size:14px;color:var(--ink-2)}
+.eq{font:15px/1.6 var(--mono);background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;overflow-x:auto;white-space:pre}
+.tbl{overflow-x:auto;background:var(--panel);border:1px solid var(--rule);border-radius:6px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 12px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal;min-width:190px}
+thead th{font:500 11.5px/1.3 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--ground)}
+tbody tr:last-child td{border-bottom:0}
+tr.hl td{background:var(--accent-soft)}
+table.text th,table.text td{text-align:left;white-space:normal}
+td.good{color:var(--accent);font-weight:600} td.bad{color:var(--warn);font-weight:600}
+.note{font-size:13px;color:var(--muted);max-width:80ch;margin:0}
+.chart{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:16px 12px 8px;overflow-x:auto}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--ink-2);padding:0 6px 8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:2px;display:inline-block}
+svg text{font-family:var(--sans)}
+.callout{border-left:3px solid var(--warn);background:var(--warn-soft);padding:12px 16px;border-radius:0 6px 6px 0}
+.callout.ok{border-color:var(--accent);background:var(--accent-soft)}
+.callout p{margin:0}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+ul{margin:0;padding-left:20px;max-width:70ch} li{margin:4px 0}
+a{color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--ground);font:12px/1.4 var(--sans);padding:6px 9px;border-radius:4px;transform:translate(-50%,-110%);white-space:nowrap}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">CS6101 · Project 20 · Mid-semester report</div>
+  <h1>DyVo: Dynamic Vocabularies for Learned Sparse Retrieval with Entities</h1>
+  <p class="sub">A from-scratch re-implementation of DyVo (Nguyen et al., EMNLP 2024), a CPU-scale reproduction of its headline comparison, and two extensions: one that makes DyVo robust to noisy entity candidates, and one that directly tests its “dynamic vocabulary” claim.</p>
+  <div class="meta">DistilBERT · monoT5 distillation · Wikipedia2Vec (2.59M entities) · 2,000 test queries · 8,067-paragraph index</div>
+</header>
+
+<section aria-labelledby="f">
+  <h2 id="f">Findings at a glance</h2>
+  <div class="findings">
+    <div class="finding"><div class="k">Headline reproduction</div><div class="v">−0.7</div><p>nDCG@10 of DyVo (linked entities) vs word-only LSR on all queries. Not significant (p = 0.11), so the paper's +2 does not transfer to our setting.</p></div>
+    <div class="finding"><div class="k">When linking is consistent</div><div class="v pos">+1.2</div><p>On the 926 queries whose entity is also linked in the relevant paragraph, DyVo is significantly better (p = 0.038).</p></div>
+    <div class="finding"><div class="k">When linking is inconsistent</div><div class="v neg">−8.5</div><p>On the 174 queries whose entity is missing from the relevant paragraph, DyVo rewards the wrong paragraphs (p &lt; 0.001).</p></div>
+    <div class="finding"><div class="k">Ext-A · DyVo-Gate</div><div class="v pos">+2.1</div><p>Over ungated DyVo with noisy candidates (p &lt; 0.001). Unchanged under 3× more noise at test time.</p></div>
+    <div class="finding"><div class="k">Ext-B · unseen entities</div><div class="v pos">+1.8</div><p>On 454 queries with entities never seen in training (p = 0.009). Removing those entities from the vocabulary removes the gain (p = 0.002).</p></div>
+    <div class="finding"><div class="k">Paper's Table 2, reproduced</div><div class="v neg">−1.4</div><p>Adding recall-oriented dense candidates to linked ones lowers nDCG@10, as the paper found for BM25 and LaQue candidates.</p></div>
+  </div>
+</section>
+
+<section aria-labelledby="m">
+  <h2 id="m">How DyVo works</h2>
+  <p>Learned sparse retrievers such as SPLADE weight the ~30k BERT word pieces, so an entity like <span class="term">Pachauri</span> becomes <span class="term">pac ##ha ##uri</span>. DyVo appends entity dimensions. A candidate generator (entity linker, retriever or LLM) proposes a few Wikipedia entities per text, and a head scores each one against a <em>frozen</em> external embedding:</p>
+  <div class="eq">w(e) = max_t  log(1 + ReLU( α · ⟨h_t , P·E_e⟩ ))        α₀ = 0.05,  E_e frozen,  P learned
+score(q, d) = ⟨ w_q , w_d ⟩  over  [30,522 word pieces] ⊕ [entities]      → still an inverted index</div>
+  <p>Because <code>E_e</code> lives outside the model, new entities can be added to the vocabulary without retraining. Extension B tests exactly this.</p>
+</section>
+
+<section aria-labelledby="b">
+  <h2 id="b">What we built</h2>
+  <div class="cols">
+    <div>
+      <h3>Model, matched to the authors' code</h3>
+      <ul>
+        <li>MLP query encoder and MLM (SPLADE) document encoder, as in the reference <code>qmlp_dmlm_emlm</code> config</li>
+        <li>DyVo head: scaled dot product, <code>log1p∘relu</code>, max-pool over tokens</li>
+        <li>KL distillation from monoT5; L1 on document word weights with quadratic warm-up; entities not regularised</li>
+        <li>6 unit tests prove our speed-ups equal the reference maths</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Everything we could not download</h3>
+      <ul>
+        <li><b>Entity linker</b> over 2.59M Wikipedia2Vec titles (REL analogue): alias, surname and acronym tables, context-vector disambiguation. It links <span class="term">Tesla</span> → Nikola Tesla and <span class="term">IPCC</span> → Intergovernmental Panel on Climate Change</li>
+        <li><b>Dense entity retriever</b> (LaQue analogue)</li>
+        <li>monoT5 teacher on CPU; paper-dataset converters for a GPU run</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="s">
+  <h2 id="s">Reproduction setup</h2>
+  <p>Robust04, Core18 and CODEC are licensed or on request, and the authors' data sits on a hub our environment cannot reach. We rebuilt the paper's <em>comparison</em> on an open, entity-rich Wikipedia benchmark, <b>SQuAD-Open-Para</b>, whose test articles are disjoint from training. The paper-scale run is fully scripted in <code>configs/paper_datasets.md</code>.</p>
+  <div class="tbl"><table class="text">
+    <thead><tr><th>Protocol step</th><th>Paper</th><th>Ours</th></tr></thead>
+    <tbody>
+      <tr><td>Initialisation</td><td>MS MARCO LSR</td><td>300-step LSR on held-out questions</td></tr>
+      <tr><td>Training</td><td>InPars-v2 + monoT5-3B, 100k steps</td><td>2,400 monoT5-base triples, 300 steps</td></tr>
+      <tr><td>Candidates</td><td>REL linker</td><td>our Wikipedia2Vec linker</td></tr>
+      <tr><td>Entity embeddings</td><td>LaQue 768-d</td><td>Wikipedia2Vec 100-d + projection</td></tr>
+      <tr><td>Backbone</td><td>DistilBERT</td><td>DistilBERT</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section aria-labelledby="r">
+  <h2 id="r">Headline comparison</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Model</th><th>nDCG@10</th><th>nDCG@20</th><th>R@100</th><th>R@1k</th><th>MRR@10</th><th>Doc words / ents</th><th>FLOPs</th></tr></thead>
+    <tbody>
+      <tr><td>BM25</td><td>84.25</td><td>84.81</td><td>97.95</td><td>99.15</td><td>81.47</td><td>–</td><td>–</td></tr>
+      <tr><td>LSR-w, stage-0 init</td><td>80.43</td><td>81.22</td><td>97.60</td><td>99.25</td><td>76.81</td><td>156 / 0</td><td>4.38</td></tr>
+      <tr><td>LSR-w (paper baseline)</td><td>78.41</td><td>79.34</td><td>97.35</td><td>98.85</td><td>74.82</td><td>98 / 0</td><td>2.14</td></tr>
+      <tr class="hl"><td>DyVo, linked entities</td><td>77.75</td><td>78.73</td><td>97.65</td><td>99.10</td><td>73.90</td><td>102 / 7.4</td><td>3.21</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">SQuAD questions were written while looking at the paragraph, so they share its words and BM25 is very strong. Absolute numbers are not comparable with the paper's Robust04 (49.13 → 51.19) or CODEC (39.10 → 42.67); only the LSR-w → DyVo comparison is.</p>
+</section>
+
+<section aria-labelledby="w">
+  <h2 id="w">Where do entities help?</h2>
+  <p>The aggregate hides two significant effects of opposite sign. DyVo helps when the query's entity is also a candidate of the relevant paragraph, and hurts badly when linking is inconsistent. The gate removes the damage.</p>
+  <div class="chart">
+    <div class="legend"><span><i style="background:var(--s1)"></i>LSR-w</span><span><i style="background:var(--s2)"></i>DyVo (linked)</span><span><i style="background:var(--s3)"></i>DyVo-Gate (Ext-A)</span></div>
+    <svg id="bars" viewBox="0 0 900 330" width="100%" role="img" aria-label="Grouped bars of nDCG@10 by query group for LSR-w, DyVo and DyVo-Gate"></svg>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Query group</th><th>Queries</th><th>LSR-w</th><th>DyVo</th><th>DyVo-Gate</th><th>DyVo − LSR-w</th></tr></thead>
+    <tbody>
+      <tr><td>No linked entity</td><td>900</td><td>73.12</td><td>72.09</td><td>73.91</td><td>−1.03</td></tr>
+      <tr><td>Linked, consistent with gold paragraph</td><td>926</td><td>84.30</td><td>85.46</td><td>83.34</td><td class="good">+1.16 (p = 0.038)</td></tr>
+      <tr><td>Linked, absent from gold paragraph</td><td>174</td><td>74.44</td><td>65.94</td><td>76.21</td><td class="bad">−8.50 (p &lt; 0.001)</td></tr>
+      <tr><td>≥1 entity unseen in training</td><td>454</td><td>86.29</td><td>88.13</td><td>85.71</td><td class="good">+1.84 (p = 0.009)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout"><p><b>Why our aggregate differs from the paper's.</b> DyVo's gain is conditional on consistent candidates on both sides. REL (anchor-text priors plus neural disambiguation) is much more consistent than our title-alias linker, and long news documents almost always mention the query entity somewhere. The paper's own Table 2 makes the same point: candidate quality drives nDCG.</p></div>
+</section>
+
+<section aria-labelledby="xa">
+  <h2 id="xa">Extension A · DyVo-Gate: robustness to noisy candidates</h2>
+  <p>The paper found that recall-oriented generators (BM25, LaQue) add noisy entities and do not improve nDCG. We gate each candidate with <code>σ(MLP([retriever score, source flags, popularity, head evidence]))</code>, initialised almost open, and inject random distractor entities during training.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Link ∪ dense candidates</th><th>nDCG@10 (training noise)</th><th>nDCG@10 (3× test noise)</th><th>R@100</th><th>Entities / doc</th></tr></thead>
+    <tbody>
+      <tr><td>LSR-w (no entities)</td><td>78.41</td><td>–</td><td>97.35</td><td>0</td></tr>
+      <tr><td>DyVo, linked only</td><td>77.75</td><td>–</td><td>97.65</td><td>7.4</td></tr>
+      <tr><td>DyVo, ungated</td><td class="bad">76.40 ‡</td><td class="bad">76.44 ‡</td><td>96.90</td><td>10.3 → 14.0</td></tr>
+      <tr class="hl"><td>DyVo-Gate (ours)</td><td class="good">78.48</td><td class="good">78.48</td><td>97.65</td><td>0.24</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">‡ significantly below LSR-w. The gate recovers +2.07 nDCG@10 over ungated DyVo (p &lt; 0.001). Caveat: it mostly prunes (40× fewer entity postings), giving up part of the consistent-linking gain. The end-sem work splits the query and document gates so the gate learns <em>which</em> entities to keep.</p>
+</section>
+
+<section aria-labelledby="xb">
+  <h2 id="xb">Extension B · Is the vocabulary really dynamic?</h2>
+  <p>The paper argues that frozen external embeddings let DyVo use entities it never trained on, but it never isolates that claim. Test articles are unseen in training, so 420 test-query entities never appeared. We evaluate one trained model twice: with every Wikipedia entity, and with the unseen entities deleted from the index (a static vocabulary).</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Vocabulary (same DyVo model)</th><th>All queries</th><th>Queries with ≥1 unseen entity (n = 454)</th></tr></thead>
+    <tbody>
+      <tr class="hl"><td>Dynamic: all Wikipedia entities</td><td>77.75</td><td class="good">88.13</td></tr>
+      <tr><td>Static: training entities only</td><td>77.30</td><td>86.16</td></tr>
+      <tr><td>Static <em>learned</em> entity table (separately trained control)</td><td class="bad">76.67 ‡</td><td>86.59</td></tr>
+      <tr><td>LSR-w (reference)</td><td>78.41</td><td>86.29</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout ok"><p><b>Supported.</b> The gain appears exactly on entities added through external embeddings (+1.97 dynamic vs static, p = 0.0017), and a model with a trainable entity table instead of frozen external embeddings loses 1.54 on the same queries (p = 0.027). This is direct evidence for DyVo's central claim. Queries whose entities were all seen in training do not gain (78.33 vs 80.24): those are frequent entities such as countries, which separate paragraphs poorly.</p></div>
+  
+</section>
+
+<section aria-labelledby="n">
+  <h2 id="n">Next, for the end-sem</h2>
+  <ul>
+    <li><b>Paper-scale Table 1</b> on Robust04 and CODEC (GPU, licensed data, authors' REL candidates and LaQue embeddings) at all three sparsity levels.</li>
+    <li><b>Ext-A at scale</b>, with the paper's BM25 and LaQue candidates: does gating recover the nDCG those candidates lost?</li>
+    <li><b>Ext-B, controlled</b>: hide 50% of entities during training and add them back at test time; compare frozen external embeddings with a learned table.</li>
+    <li><b>Stretch</b>: an open 7–8B model as the candidate generator instead of GPT-4, snapped to Wikipedia2Vec titles with our alias table.</li>
+  </ul>
+  <p class="meta">Code, per-run metrics and the full report: <code>infinity2147/cs6101_midsem</code>, branch <code>claude/dyvo-dynamic-vocabularies-sparse-3qvicl</code> · report/MIDSEM_REPORT.md</p>
+</section>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+(function(){
+  const groups=["No linked entity (900)","Consistent linking (926)","Inconsistent linking (174)","Unseen entity (454)"];
+  const series=[["LSR-w","--s1",[73.12,84.30,74.44,86.29]],["DyVo (linked)","--s2",[72.09,85.46,65.94,88.13]],["DyVo-Gate","--s3",[73.91,83.34,76.21,85.71]]];
+  const svg=document.getElementById("bars"), ns="http://www.w3.org/2000/svg", tip=document.getElementById("tip");
+  const W=900,H=330,L=48,R=10,T=14,B=48,y0=60,y1=92;
+  const y=v=>T+(H-T-B)*(1-(v-y0)/(y1-y0));
+  const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  function el(t,a){const e=document.createElementNS(ns,t);for(const k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e}
+  function draw(){
+    svg.innerHTML="";
+    for(let v=60;v<=90;v+=5){el("line",{x1:L,x2:W-R,y1:y(v),y2:y(v),stroke:css("--grid"),"stroke-width":1});
+      const t=el("text",{x:L-8,y:y(v)+4,"text-anchor":"end","font-size":11,fill:css("--muted")});t.textContent=v}
+    const gw=(W-L-R)/groups.length, bw=Math.min(52,(gw-40)/3);
+    groups.forEach((g,i)=>{
+      const cx=L+gw*i+gw/2;
+      series.forEach(([name,c,vals],k)=>{
+        const x=cx+(k-1)*(bw+3)-bw/2, v=vals[i];
+        const r=el("rect",{x,y:y(v),width:bw,height:y(y0)-y(v),fill:css(c),rx:2});
+        const hit=el("rect",{x:x-2,y:T,width:bw+4,height:H-T-B,fill:"transparent"});
+        const show=e=>{tip.hidden=false;tip.textContent=name+" · "+g+": "+v.toFixed(2);tip.style.left=e.clientX+"px";tip.style.top=e.clientY+"px"};
+        hit.addEventListener("mousemove",show);hit.addEventListener("mouseleave",()=>tip.hidden=true);
+        const t=el("text",{x:x+bw/2,y:y(v)-5,"text-anchor":"middle","font-size":10.5,fill:css("--ink-2")});t.textContent=v.toFixed(1);
+      });
+      const lab=el("text",{x:cx,y:H-B+20,"text-anchor":"middle","font-size":12,fill:css("--ink")});lab.textContent=g;
+    });
+    el("line",{x1:L,x2:W-R,y1:y(y0),y2:y(y0),stroke:css("--ink-2"),"stroke-width":1});
+    const yl=el("text",{x:L,y:H-6,"font-size":11,fill:css("--muted")});yl.textContent="nDCG@10 · axis starts at 60";
+  }
+  draw();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change",draw);
+  new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+})();
+</script>
