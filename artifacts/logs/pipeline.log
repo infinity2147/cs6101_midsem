@@ -1,0 +1,662 @@
+[07:15:03] stage 0
+
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 100/100 [00:00<00:00, 10122.61it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: /home/user/data/models/distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_projector.weight  | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+vocab_transform.bias    | UNEXPECTED |  | 
+vocab_layer_norm.weight | UNEXPECTED |  | 
+vocab_projector.bias    | UNEXPECTED |  | 
+vocab_transform.weight  | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+Loading weights:   0%|          | 0/106 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 106/106 [00:00<00:00, 6811.75it/s]
+2400 triples, 300 steps, entities=0
+{"step": 25, "loss": 1.1497, "kl": 0.2681, "reg_d": 0.0371, "q_nnz": 10.745, "d_nnz": 12755.46, "acc": 0.92, "s/step": 10.16}
+{"step": 50, "loss": 0.5746, "kl": 0.2585, "reg_d": 0.026, "q_nnz": 12.04, "d_nnz": 767.7125, "acc": 0.92, "s/step": 9.69}
+{"step": 75, "loss": 0.4739, "kl": 0.1972, "reg_d": 0.062, "q_nnz": 11.765, "d_nnz": 698.655, "acc": 0.925, "s/step": 9.53}
+{"step": 100, "loss": 0.5717, "kl": 0.2282, "reg_d": 0.0725, "q_nnz": 11.85, "d_nnz": 390.28, "acc": 0.93, "s/step": 9.45}
+{"step": 125, "loss": 0.5929, "kl": 0.2277, "reg_d": 0.0876, "q_nnz": 11.34, "d_nnz": 285.63, "acc": 0.915, "s/step": 9.41}
+{"step": 150, "loss": 0.4589, "kl": 0.145, "reg_d": 0.129, "q_nnz": 9.515, "d_nnz": 282.62, "acc": 0.945, "s/step": 9.39}
+{"step": 175, "loss": 0.4276, "kl": 0.1472, "reg_d": 0.104, "q_nnz": 9.005, "d_nnz": 185.4475, "acc": 0.945, "s/step": 9.35}
+{"step": 200, "loss": 0.6451, "kl": 0.251, "reg_d": 0.0977, "q_nnz": 11.29, "d_nnz": 170.605, "acc": 0.895, "s/step": 9.33}
+{"step": 225, "loss": 0.4663, "kl": 0.1692, "reg_d": 0.0976, "q_nnz": 11.465, "d_nnz": 173.0525, "acc": 0.935, "s/step": 9.31}
+{"step": 250, "loss": 0.4988, "kl": 0.1864, "reg_d": 0.0982, "q_nnz": 11.425, "d_nnz": 175.36, "acc": 0.925, "s/step": 9.31}
+{"step": 275, "loss": 0.3837, "kl": 0.1329, "reg_d": 0.0862, "q_nnz": 11.425, "d_nnz": 150.6675, "acc": 0.935, "s/step": 9.29}
+{"step": 300, "loss": 0.4959, "kl": 0.1841, "reg_d": 0.0822, "q_nnz": 11.0, "d_nnz": 142.625, "acc": 0.915, "s/step": 9.29}
+done in 46.5 min
+[08:01:41] waiting for teacher
+
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 100/100 [00:00<00:00, 4981.42it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: /home/user/data/models/distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_projector.weight  | UNEXPECTED |  | 
+vocab_transform.weight  | UNEXPECTED |  | 
+vocab_layer_norm.weight | UNEXPECTED |  | 
+vocab_projector.bias    | UNEXPECTED |  | 
+vocab_transform.bias    | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+Loading weights:   0%|          | 0/106 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 106/106 [00:00<00:00, 10968.48it/s]
+  encoded 32/8067 (1s)
+  encoded 3232/8067 (231s)
+  encoded 6432/8067 (536s)
+  encoded 32/2000 (0s)
+{
+ "agg": {
+  "nDCG@10": 80.43016657236713,
+  "nDCG@20": 81.21748258071902,
+  "R@100": 97.6,
+  "R@1000": 99.25,
+  "RR@10": 76.80603174603175
+ },
+ "stats": {
+  "q_words": 11.2255,
+  "q_ents": 0.0,
+  "d_words": 156.0260319821495,
+  "d_ents": 0.0,
+  "flops": 4.379248233543397,
+  "flops_ent": 0.0,
+  "index_postings": 1258662
+ },
+ "ms_per_query": 1.129123330116272
+}
+[08:13:43] train lsr_w
+
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 100/100 [00:00<00:00, 6339.73it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: /home/user/data/models/distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_transform.bias    | UNEXPECTED |  | 
+vocab_layer_norm.weight | UNEXPECTED |  | 
+vocab_projector.bias    | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+vocab_transform.weight  | UNEXPECTED |  | 
+vocab_projector.weight  | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+Loading weights:   0%|          | 0/106 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 106/106 [00:00<00:00, 5123.97it/s]
+init from /home/user/work/runs/lsr_init: missing(non-head)=[] unexpected=[]
+2400 triples, 300 steps, entities=0
+{"step": 25, "loss": 0.2124, "kl": 0.2115, "reg_d": 0.0009, "q_nnz": 10.585, "d_nnz": 150.0425, "acc": 0.94, "s/step": 5.88}
+{"step": 50, "loss": 0.1146, "kl": 0.1021, "reg_d": 0.0126, "q_nnz": 9.725, "d_nnz": 360.8225, "acc": 0.955, "s/step": 5.78}
+{"step": 75, "loss": 0.2302, "kl": 0.2105, "reg_d": 0.0197, "q_nnz": 8.78, "d_nnz": 211.1075, "acc": 0.92, "s/step": 5.73}
+{"step": 100, "loss": 0.2233, "kl": 0.1852, "reg_d": 0.0381, "q_nnz": 9.265, "d_nnz": 200.22, "acc": 0.93, "s/step": 5.71}
+{"step": 125, "loss": 0.1939, "kl": 0.1598, "reg_d": 0.0342, "q_nnz": 8.74, "d_nnz": 108.8725, "acc": 0.92, "s/step": 5.71}
+{"step": 150, "loss": 0.2673, "kl": 0.2302, "reg_d": 0.0371, "q_nnz": 8.48, "d_nnz": 76.0525, "acc": 0.9, "s/step": 5.73}
+{"step": 175, "loss": 0.308, "kl": 0.2522, "reg_d": 0.0558, "q_nnz": 9.48, "d_nnz": 100.295, "acc": 0.875, "s/step": 5.72}
+{"step": 200, "loss": 0.2483, "kl": 0.2033, "reg_d": 0.0449, "q_nnz": 9.905, "d_nnz": 79.7825, "acc": 0.87, "s/step": 5.7}
+{"step": 225, "loss": 0.1951, "kl": 0.1472, "reg_d": 0.0479, "q_nnz": 10.85, "d_nnz": 85.5475, "acc": 0.93, "s/step": 5.7}
+{"step": 250, "loss": 0.2194, "kl": 0.178, "reg_d": 0.0413, "q_nnz": 10.02, "d_nnz": 74.765, "acc": 0.92, "s/step": 5.71}
+{"step": 275, "loss": 0.1811, "kl": 0.1336, "reg_d": 0.0475, "q_nnz": 8.625, "d_nnz": 87.4, "acc": 0.94, "s/step": 5.72}
+{"step": 300, "loss": 0.2218, "kl": 0.172, "reg_d": 0.0497, "q_nnz": 8.69, "d_nnz": 91.105, "acc": 0.93, "s/step": 5.71}
+done in 28.6 min
+[08:42:30] eval lsr_w
+
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 100/100 [00:00<00:00, 7884.77it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: /home/user/data/models/distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_transform.bias    | UNEXPECTED |  | 
+vocab_layer_norm.weight | UNEXPECTED |  | 
+vocab_projector.weight  | UNEXPECTED |  | 
+vocab_transform.weight  | UNEXPECTED |  | 
+vocab_projector.bias    | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+Loading weights:   0%|          | 0/106 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 106/106 [00:00<00:00, 6011.71it/s]
+  encoded 32/8067 (1s)
+  encoded 3232/8067 (228s)
+  encoded 6432/8067 (523s)
+  encoded 32/2000 (0s)
+{
+ "agg": {
+  "nDCG@10": 78.41167729552,
+  "nDCG@20": 79.34049554369913,
+  "R@100": 97.35000000000001,
+  "R@1000": 98.85000000000001,
+  "RR@10": 74.81773809523808
+ },
+ "stats": {
+  "q_words": 9.3245,
+  "q_ents": 0.0,
+  "d_words": 97.93442419734721,
+  "d_ents": 0.0,
+  "flops": 2.1353707078217083,
+  "flops_ent": 0.0,
+  "index_postings": 790037
+ },
+ "ms_per_query": 1.0629658699035645
+}
+[08:54:13] train dyvo_link_w2v
+
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 100/100 [00:00<00:00, 7130.38it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: /home/user/data/models/distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_layer_norm.weight | UNEXPECTED |  | 
+vocab_projector.bias    | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+vocab_transform.weight  | UNEXPECTED |  | 
+vocab_projector.weight  | UNEXPECTED |  | 
+vocab_transform.bias    | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+Loading weights:   0%|          | 0/106 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 106/106 [00:00<00:00, 5786.83it/s]
+init from /home/user/work/runs/lsr_init: missing(non-head)=[] unexpected=[]
+2400 triples, 300 steps, entities=56593
+{"step": 25, "loss": 0.2101, "kl": 0.2092, "reg_d": 0.0009, "q_nnz": 10.39, "d_nnz": 155.3525, "acc": 0.93, "q_ent_nnz": 0.72, "d_ent_nnz": 6.7375, "ent_weight": 0.0508, "s/step": 5.95}
+{"step": 50, "loss": 0.0991, "kl": 0.0868, "reg_d": 0.0124, "q_nnz": 7.81, "d_nnz": 354.245, "acc": 0.97, "q_ent_nnz": 0.665, "d_ent_nnz": 6.5525, "ent_weight": 0.0538, "s/step": 5.89}
+{"step": 75, "loss": 0.2466, "kl": 0.2295, "reg_d": 0.0172, "q_nnz": 5.97, "d_nnz": 185.82, "acc": 0.92, "q_ent_nnz": 0.705, "d_ent_nnz": 6.8275, "ent_weight": 0.0552, "s/step": 5.81}
+{"step": 100, "loss": 0.2511, "kl": 0.22, "reg_d": 0.0311, "q_nnz": 6.085, "d_nnz": 154.6575, "acc": 0.885, "q_ent_nnz": 0.725, "d_ent_nnz": 6.7625, "ent_weight": 0.0608, "s/step": 5.8}
+{"step": 125, "loss": 0.2087, "kl": 0.1735, "reg_d": 0.0352, "q_nnz": 7.98, "d_nnz": 112.925, "acc": 0.9, "q_ent_nnz": 0.79, "d_ent_nnz": 6.84, "ent_weight": 0.055, "s/step": 5.8}
+{"step": 150, "loss": 0.2532, "kl": 0.2119, "reg_d": 0.0413, "q_nnz": 8.775, "d_nnz": 85.375, "acc": 0.91, "q_ent_nnz": 0.67, "d_ent_nnz": 6.8075, "ent_weight": 0.0539, "s/step": 5.79}
+{"step": 175, "loss": 0.3217, "kl": 0.265, "reg_d": 0.0568, "q_nnz": 10.225, "d_nnz": 105.2075, "acc": 0.845, "q_ent_nnz": 0.63, "d_ent_nnz": 6.675, "ent_weight": 0.0566, "s/step": 5.79}
+{"step": 200, "loss": 0.2677, "kl": 0.2212, "reg_d": 0.0465, "q_nnz": 10.925, "d_nnz": 86.1075, "acc": 0.88, "q_ent_nnz": 0.7, "d_ent_nnz": 6.835, "ent_weight": 0.058, "s/step": 5.8}
+{"step": 225, "loss": 0.2058, "kl": 0.1651, "reg_d": 0.0407, "q_nnz": 11.595, "d_nnz": 74.3675, "acc": 0.92, "q_ent_nnz": 0.75, "d_ent_nnz": 7.3425, "ent_weight": 0.0605, "s/step": 5.8}
+{"step": 250, "loss": 0.2495, "kl": 0.2088, "reg_d": 0.0407, "q_nnz": 11.525, "d_nnz": 75.2375, "acc": 0.915, "q_ent_nnz": 0.73, "d_ent_nnz": 6.705, "ent_weight": 0.0625, "s/step": 5.8}
+{"step": 275, "loss": 0.2352, "kl": 0.1854, "reg_d": 0.0498, "q_nnz": 10.31, "d_nnz": 93.37, "acc": 0.925, "q_ent_nnz": 0.62, "d_ent_nnz": 6.805, "ent_weight": 0.0624, "s/step": 5.79}
+{"step": 300, "loss": 0.2134, "kl": 0.1632, "reg_d": 0.0503, "q_nnz": 9.985, "d_nnz": 93.8125, "acc": 0.91, "q_ent_nnz": 0.68, "d_ent_nnz": 6.985, "ent_weight": 0.0616, "s/step": 5.8}
+done in 29.0 min
+[09:23:50] eval dyvo_link_w2v
+
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 100/100 [00:00<00:00, 6995.29it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: /home/user/data/models/distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_transform.weight  | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+vocab_transform.bias    | UNEXPECTED |  | 
+vocab_projector.bias    | UNEXPECTED |  | 
+vocab_projector.weight  | UNEXPECTED |  | 
+vocab_layer_norm.weight | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+Loading weights:   0%|          | 0/106 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 106/106 [00:00<00:00, 5661.55it/s]
+  encoded 32/8067 (1s)
+  encoded 3232/8067 (231s)
+  encoded 6432/8067 (536s)
+  encoded 32/2000 (0s)
+{
+ "agg": {
+  "nDCG@10": 77.74521895227203,
+  "nDCG@20": 78.73029741592697,
+  "R@100": 97.65,
+  "R@1000": 99.1,
+  "RR@10": 73.90361111111112
+ },
+ "stats": {
+  "q_words": 10.6465,
+  "q_ents": 0.722,
+  "d_words": 102.31312755671253,
+  "d_ents": 7.365315482831288,
+  "flops": 3.2117591421837215,
+  "flops_ent": 0.0023640138837238175,
+  "index_postings": 884776
+ },
+ "ms_per_query": 1.1815252304077148
+}
+[09:35:55] train dyvo_linkdense_w2v
+
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 100/100 [00:00<00:00, 5499.64it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: /home/user/data/models/distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_projector.bias    | UNEXPECTED |  | 
+vocab_layer_norm.weight | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+vocab_transform.bias    | UNEXPECTED |  | 
+vocab_projector.weight  | UNEXPECTED |  | 
+vocab_transform.weight  | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+Loading weights:   0%|          | 0/106 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 106/106 [00:00<00:00, 6301.41it/s]
+init from /home/user/work/runs/lsr_init: missing(non-head)=[] unexpected=[]
+2400 triples, 300 steps, entities=82762
+{"step": 25, "loss": 0.2097, "kl": 0.2088, "reg_d": 0.0009, "q_nnz": 10.62, "d_nnz": 155.1975, "acc": 0.935, "q_ent_nnz": 10.115, "d_ent_nnz": 27.01, "ent_weight": 0.0514, "s/step": 6.89}
+{"step": 50, "loss": 0.1096, "kl": 0.0969, "reg_d": 0.0127, "q_nnz": 9.06, "d_nnz": 363.7975, "acc": 0.96, "q_ent_nnz": 10.585, "d_ent_nnz": 26.5725, "ent_weight": 0.0536, "s/step": 6.5}
+{"step": 75, "loss": 0.2314, "kl": 0.2114, "reg_d": 0.02, "q_nnz": 7.055, "d_nnz": 217.1025, "acc": 0.915, "q_ent_nnz": 3.885, "d_ent_nnz": 12.82, "ent_weight": 0.0483, "s/step": 6.3}
+{"step": 100, "loss": 0.2468, "kl": 0.2112, "reg_d": 0.0356, "q_nnz": 9.415, "d_nnz": 182.9125, "acc": 0.9, "q_ent_nnz": 1.43, "d_ent_nnz": 1.77, "ent_weight": 0.0471, "s/step": 6.2}
+{"step": 125, "loss": 0.2208, "kl": 0.1826, "reg_d": 0.0381, "q_nnz": 8.815, "d_nnz": 121.2425, "acc": 0.91, "q_ent_nnz": 1.535, "d_ent_nnz": 1.705, "ent_weight": 0.047, "s/step": 6.15}
+{"step": 150, "loss": 0.1752, "kl": 0.1249, "reg_d": 0.0503, "q_nnz": 8.785, "d_nnz": 104.7375, "acc": 0.94, "q_ent_nnz": 1.195, "d_ent_nnz": 1.1575, "ent_weight": 0.047, "s/step": 6.11}
+{"step": 175, "loss": 0.3022, "kl": 0.2551, "reg_d": 0.0471, "q_nnz": 8.76, "d_nnz": 85.1975, "acc": 0.865, "q_ent_nnz": 1.35, "d_ent_nnz": 3.425, "ent_weight": 0.0471, "s/step": 6.09}
+{"step": 200, "loss": 0.255, "kl": 0.2102, "reg_d": 0.0448, "q_nnz": 8.2, "d_nnz": 82.805, "acc": 0.885, "q_ent_nnz": 1.44, "d_ent_nnz": 5.65, "ent_weight": 0.0472, "s/step": 6.07}
+{"step": 225, "loss": 0.2058, "kl": 0.162, "reg_d": 0.0438, "q_nnz": 9.375, "d_nnz": 80.69, "acc": 0.905, "q_ent_nnz": 1.815, "d_ent_nnz": 7.2275, "ent_weight": 0.0473, "s/step": 6.07}
+{"step": 250, "loss": 0.2526, "kl": 0.2122, "reg_d": 0.0404, "q_nnz": 9.735, "d_nnz": 74.8225, "acc": 0.915, "q_ent_nnz": 2.73, "d_ent_nnz": 9.86, "ent_weight": 0.0476, "s/step": 6.06}
+{"step": 275, "loss": 0.2069, "kl": 0.1639, "reg_d": 0.0431, "q_nnz": 9.145, "d_nnz": 79.88, "acc": 0.93, "q_ent_nnz": 3.35, "d_ent_nnz": 10.21, "ent_weight": 0.0476, "s/step": 6.07}
+{"step": 300, "loss": 0.2261, "kl": 0.1826, "reg_d": 0.0435, "q_nnz": 8.915, "d_nnz": 80.72, "acc": 0.895, "q_ent_nnz": 3.52, "d_ent_nnz": 11.1525, "ent_weight": 0.0476, "s/step": 6.07}
+done in 30.4 min
+[10:06:34] eval dyvo_linkdense_w2v
+
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 100/100 [00:00<00:00, 7644.91it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: /home/user/data/models/distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_transform.bias    | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+vocab_transform.weight  | UNEXPECTED |  | 
+vocab_projector.bias    | UNEXPECTED |  | 
+vocab_projector.weight  | UNEXPECTED |  | 
+vocab_layer_norm.weight | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+Loading weights:   0%|          | 0/106 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 106/106 [00:00<00:00, 5474.78it/s]
+  encoded 32/8067 (1s)
+  encoded 3232/8067 (233s)
+  encoded 6432/8067 (531s)
+  encoded 32/2000 (0s)
+{
+ "agg": {
+  "nDCG@10": 76.40368385033801,
+  "nDCG@20": 77.31370403830888,
+  "R@100": 96.89999999999999,
+  "R@1000": 98.8,
+  "RR@10": 72.3638888888889
+ },
+ "stats": {
+  "q_words": 9.545,
+  "q_ents": 3.0645,
+  "d_words": 88.10264038676088,
+  "d_ents": 10.269121110697904,
+  "flops": 2.2174871079704532,
+  "flops_ent": 0.022718854592785047,
+  "index_postings": 793565
+ },
+ "ms_per_query": 1.1116167306900024
+}
+[10:18:38] train dyvo_linkdense_gate
+
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 100/100 [00:00<00:00, 5127.57it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: /home/user/data/models/distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_projector.weight  | UNEXPECTED |  | 
+vocab_transform.bias    | UNEXPECTED |  | 
+vocab_transform.weight  | UNEXPECTED |  | 
+vocab_projector.bias    | UNEXPECTED |  | 
+vocab_layer_norm.weight | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+Loading weights:   0%|          | 0/106 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 106/106 [00:00<00:00, 6091.78it/s]
+init from /home/user/work/runs/lsr_init: missing(non-head)=[] unexpected=[]
+2400 triples, 300 steps, entities=82762
+{"step": 25, "loss": 0.1812, "kl": 0.1803, "reg_d": 0.0009, "q_nnz": 10.71, "d_nnz": 152.245, "acc": 0.945, "q_ent_nnz": 13.925, "d_ent_nnz": 30.705, "ent_weight": 0.0515, "s/step": 6.29}
+{"step": 50, "loss": 0.1115, "kl": 0.1022, "reg_d": 0.0093, "q_nnz": 8.44, "d_nnz": 251.475, "acc": 0.95, "q_ent_nnz": 14.585, "d_ent_nnz": 30.55, "ent_weight": 0.0572, "s/step": 6.09}
+{"step": 75, "loss": 0.2209, "kl": 0.2005, "reg_d": 0.0204, "q_nnz": 5.145, "d_nnz": 218.9, "acc": 0.915, "q_ent_nnz": 14.56, "d_ent_nnz": 13.64, "ent_weight": 0.0547, "s/step": 6.02}
+{"step": 100, "loss": 0.2274, "kl": 0.1977, "reg_d": 0.0297, "q_nnz": 6.495, "d_nnz": 149.855, "acc": 0.915, "q_ent_nnz": 14.635, "d_ent_nnz": 1.22, "ent_weight": 0.053, "s/step": 5.97}
+{"step": 125, "loss": 0.2365, "kl": 0.1999, "reg_d": 0.0366, "q_nnz": 9.765, "d_nnz": 111.3325, "acc": 0.91, "q_ent_nnz": 14.645, "d_ent_nnz": 0.4575, "ent_weight": 0.0526, "s/step": 5.93}
+{"step": 150, "loss": 0.2083, "kl": 0.1612, "reg_d": 0.0471, "q_nnz": 9.92, "d_nnz": 97.6975, "acc": 0.925, "q_ent_nnz": 14.535, "d_ent_nnz": 0.1075, "ent_weight": 0.052, "s/step": 5.92}
+{"step": 175, "loss": 0.3032, "kl": 0.2552, "reg_d": 0.048, "q_nnz": 8.775, "d_nnz": 86.5875, "acc": 0.87, "q_ent_nnz": 14.465, "d_ent_nnz": 0.1525, "ent_weight": 0.0519, "s/step": 5.9}
+{"step": 200, "loss": 0.2576, "kl": 0.2122, "reg_d": 0.0455, "q_nnz": 8.17, "d_nnz": 83.77, "acc": 0.855, "q_ent_nnz": 14.5, "d_ent_nnz": 0.1525, "ent_weight": 0.0519, "s/step": 5.87}
+{"step": 225, "loss": 0.2063, "kl": 0.1567, "reg_d": 0.0496, "q_nnz": 8.875, "d_nnz": 93.5575, "acc": 0.915, "q_ent_nnz": 14.595, "d_ent_nnz": 0.2075, "ent_weight": 0.0519, "s/step": 5.86}
+{"step": 250, "loss": 0.2034, "kl": 0.1554, "reg_d": 0.048, "q_nnz": 9.0, "d_nnz": 91.33, "acc": 0.915, "q_ent_nnz": 14.605, "d_ent_nnz": 0.2425, "ent_weight": 0.0519, "s/step": 5.86}
+{"step": 275, "loss": 0.2016, "kl": 0.1463, "reg_d": 0.0553, "q_nnz": 8.68, "d_nnz": 106.8675, "acc": 0.955, "q_ent_nnz": 14.51, "d_ent_nnz": 0.255, "ent_weight": 0.0519, "s/step": 5.86}
+{"step": 300, "loss": 0.2163, "kl": 0.1625, "reg_d": 0.0538, "q_nnz": 8.225, "d_nnz": 104.24, "acc": 0.915, "q_ent_nnz": 14.51, "d_ent_nnz": 0.32, "ent_weight": 0.0519, "s/step": 5.86}
+done in 29.3 min
+[10:48:14] eval dyvo_linkdense_gate
+
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 100/100 [00:00<00:00, 5973.86it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: /home/user/data/models/distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_layer_norm.weight | UNEXPECTED |  | 
+vocab_transform.bias    | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+vocab_projector.weight  | UNEXPECTED |  | 
+vocab_transform.weight  | UNEXPECTED |  | 
+vocab_projector.bias    | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+Loading weights:   0%|          | 0/106 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 106/106 [00:00<00:00, 6336.53it/s]
+  encoded 32/8067 (1s)
+  encoded 3232/8067 (235s)
+  encoded 6432/8067 (537s)
+  encoded 32/2000 (0s)
+{
+ "agg": {
+  "nDCG@10": 78.47550133036154,
+  "nDCG@20": 79.26581286103105,
+  "R@100": 97.65,
+  "R@1000": 98.9,
+  "RR@10": 74.61472222222223
+ },
+ "stats": {
+  "q_words": 8.96,
+  "q_ents": 10.589,
+  "d_words": 109.73335812569728,
+  "d_ents": 0.24122970125201437,
+  "flops": 2.0246325771659714,
+  "flops_ent": 3.353167224494857e-05,
+  "index_postings": 887165
+ },
+ "ms_per_query": 1.0905805826187134
+}
+
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 100/100 [00:00<00:00, 5682.57it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: /home/user/data/models/distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_layer_norm.weight | UNEXPECTED |  | 
+vocab_projector.bias    | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+vocab_transform.weight  | UNEXPECTED |  | 
+vocab_transform.bias    | UNEXPECTED |  | 
+vocab_projector.weight  | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+Loading weights:   0%|          | 0/106 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 106/106 [00:00<00:00, 6789.91it/s]
+  encoded 32/8067 (1s)
+  encoded 3232/8067 (234s)
+  encoded 6432/8067 (542s)
+  encoded 32/2000 (0s)
+{
+ "agg": {
+  "nDCG@10": 76.43996842498004,
+  "nDCG@20": 77.35156756397934,
+  "R@100": 96.89999999999999,
+  "R@1000": 98.8,
+  "RR@10": 72.4109126984127
+ },
+ "stats": {
+  "q_words": 9.545,
+  "q_ents": 9.6295,
+  "d_words": 88.10264038676088,
+  "d_ents": 13.979050452460642,
+  "flops": 2.30915172926709,
+  "flops_ent": 0.11438347588942133,
+  "index_postings": 823493
+ },
+ "ms_per_query": 1.2321324348449707
+}
+
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 100/100 [00:00<00:00, 6256.61it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: /home/user/data/models/distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_projector.weight  | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+vocab_transform.bias    | UNEXPECTED |  | 
+vocab_transform.weight  | UNEXPECTED |  | 
+vocab_projector.bias    | UNEXPECTED |  | 
+vocab_layer_norm.weight | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+Loading weights:   0%|          | 0/106 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 106/106 [00:00<00:00, 6768.71it/s]
+  encoded 32/8067 (1s)
+  encoded 3232/8067 (235s)
+  encoded 6432/8067 (537s)
+  encoded 32/2000 (0s)
+{
+ "agg": {
+  "nDCG@10": 78.47550133036154,
+  "nDCG@20": 79.26581286103105,
+  "R@100": 97.65,
+  "R@1000": 98.9,
+  "RR@10": 74.61472222222223
+ },
+ "stats": {
+  "q_words": 8.96,
+  "q_ents": 30.3755,
+  "d_words": 109.73335812569728,
+  "d_ents": 0.24420478492624273,
+  "flops": 2.0246410065697145,
+  "flops_ent": 4.1961075988595516e-05,
+  "index_postings": 887189
+ },
+ "ms_per_query": 1.128221869468689
+}
+### Headline reproduction (paper Table 1 analogue)
+
+| Model | nDCG@10 | nDCG@20 | R@100 | R@1k | MRR@10 | doc words/ents \| q words/ents \| FLOPs |
+|---|---|---|---|---|---|---|
+| BM25 | 84.25 | 84.81 | 97.95 | 99.15 | 81.47 | – |
+| LSR-w stage-0 init (no distillation) | 80.43† | 81.22 | 97.60 | 99.25 | 76.81 | 156 / 0.0 | 11.2 / 0.0 | 4.38 |
+| LSR-w | 78.41 | 79.34 | 97.35 | 98.85 | 74.82 | 98 / 0.0 | 9.3 / 0.0 | 2.14 |
+| DyVo (linked entities, Wikipedia2Vec) | 77.75 | 78.73 | 97.65 | 99.10 | 73.90 | 102 / 7.4 | 10.6 / 0.7 | 3.21 |
+
+### Candidate source & Ext-A noise robustness (paper Table 2 analogue)
+
+| Model | nDCG@10 | nDCG@20 | R@100 | R@1k | MRR@10 | doc words/ents \| q words/ents \| FLOPs |
+|---|---|---|---|---|---|---|
+| DyVo – linked (precision) | 77.75 | 78.73 | 97.65 | 99.10 | 73.90 | 102 / 7.4 | 10.6 / 0.7 | 3.21 |
+| DyVo – link ∪ dense top-10/20 (recall, noisy) | 76.40‡ | 77.31 | 96.90 | 98.80 | 72.36 | 88 / 10.3 | 9.5 / 3.1 | 2.22 |
+|   … same model, 3x test-time noise (top-30/30) | 76.44‡ | 77.35 | 96.90 | 98.80 | 72.41 | 88 / 14.0 | 9.5 / 9.6 | 2.31 |
+| DyVo-Gate (Ext-A) – link ∪ dense | 78.48 | 79.27 | 97.65 | 98.90 | 74.61 | 110 / 0.2 | 9.0 / 10.6 | 2.02 |
+|   … same model, 3x test-time noise (top-30/30) | 78.48 | 79.27 | 97.65 | 98.90 | 74.61 | 110 / 0.2 | 9.0 / 30.4 | 2.02 |
+
+### Entity embeddings (paper Table 3 analogue)
+
+| Model | nDCG@10 | nDCG@20 | R@100 | R@1k | MRR@10 | doc words/ents \| q words/ents \| FLOPs |
+|---|---|---|---|---|---|---|
+| Wikipedia2Vec (100d, frozen, projected) | 77.75 | 78.73 | 97.65 | 99.10 | 73.90 | 102 / 7.4 | 10.6 / 0.7 | 3.21 |
+
+### Candidate quality
+
+| Candidate source (test queries) | avg #cands | gold-article-entity recall |
+|---|---|---|
+| WikiLinker (REL analogue) | 0.7 | 16.9% |
+| Dense W2V top-10 (LaQue analogue) | 10.0 | 4.8% |
+| Dense W2V top-30 | 30.0 | 7.6% |
+| Linker ∪ dense top-10 | 10.7 | 20.0% |
+
+### Linking consistency (nDCG@10 by query group)
+
+| Query group | #q | LSR-w | DyVo (link) | DyVo (link+dense) | DyVo-Gate |
+|---|---|---|---|---|---|
+| no linked query entity | 900 | 73.12 | 72.09 | 71.23 | 73.91 |
+| query entity linked, absent from gold doc | 174 | 74.44 | 65.94 | 72.51 | 76.21 |
+| query entity also linked in gold doc | 926 | 84.30 | 85.46 | 82.16 | 83.34 |
+
+### Ext-B: dynamic vocabulary and unseen entities
+
+| Query group | #q | LSR-w | DyVo (frozen W2V, dynamic) | DyVo (static learned table) |
+|---|---|---|---|---|
+| no entity linked | 900 | 73.12 | 72.09 | – |
+| all entities seen in training | 646 | 80.24 | 78.33 | – |
+| >=1 unseen entity | 454 | 86.29 | 88.13 | – |
+
+Test-time vocabulary restriction of the same DyVo model (entities never seen in training removed from the index = a static vocabulary):
+
+| Vocabulary | all queries nDCG@10 | >=1-unseen-entity queries nDCG@10 |
+|---|---|---|
+| dynamic (all Wikipedia entities) | 77.75 | 88.13 |
+| static (training entities only) | 77.30 | 86.16 |
+
+16686 distinct entities seen in training; 420 distinct test-query entities unseen.
+
+† / ‡ : significantly better / worse than LSR-w (paired t-test on nDCG@10, p<0.05).
+[11:25:21] CORE DONE
+[11:25:21] train dyvo_link_learned
+
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 100/100 [00:00<00:00, 6737.08it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: /home/user/data/models/distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_projector.bias    | UNEXPECTED |  | 
+vocab_layer_norm.weight | UNEXPECTED |  | 
+vocab_transform.weight  | UNEXPECTED |  | 
+vocab_transform.bias    | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+vocab_projector.weight  | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+Loading weights:   0%|          | 0/106 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 106/106 [00:00<00:00, 5904.41it/s]
+init from /home/user/work/runs/lsr_init: missing(non-head)=[] unexpected=[]
+2400 triples, 300 steps, entities=56593
+{"step": 25, "loss": 0.195, "kl": 0.194, "reg_d": 0.0009, "q_nnz": 10.815, "d_nnz": 152.7125, "acc": 0.945, "q_ent_nnz": 0.64, "d_ent_nnz": 6.815, "ent_weight": 0.0497, "s/step": 9.57}
+{"step": 50, "loss": 0.1266, "kl": 0.1148, "reg_d": 0.0118, "q_nnz": 8.955, "d_nnz": 331.325, "acc": 0.945, "q_ent_nnz": 0.595, "d_ent_nnz": 6.2925, "ent_weight": 0.0501, "s/step": 8.17}
+{"step": 75, "loss": 0.2651, "kl": 0.2426, "reg_d": 0.0224, "q_nnz": 9.455, "d_nnz": 249.18, "acc": 0.925, "q_ent_nnz": 0.605, "d_ent_nnz": 6.365, "ent_weight": 0.0515, "s/step": 7.64}
+{"step": 100, "loss": 0.2191, "kl": 0.1844, "reg_d": 0.0347, "q_nnz": 8.235, "d_nnz": 180.3325, "acc": 0.92, "q_ent_nnz": 0.67, "d_ent_nnz": 6.2175, "ent_weight": 0.056, "s/step": 7.38}
+{"step": 125, "loss": 0.1996, "kl": 0.1642, "reg_d": 0.0353, "q_nnz": 9.225, "d_nnz": 114.5325, "acc": 0.91, "q_ent_nnz": 0.72, "d_ent_nnz": 5.64, "ent_weight": 0.062, "s/step": 7.22}
+{"step": 150, "loss": 0.2221, "kl": 0.1696, "reg_d": 0.0525, "q_nnz": 9.315, "d_nnz": 109.8825, "acc": 0.92, "q_ent_nnz": 0.545, "d_ent_nnz": 5.37, "ent_weight": 0.0668, "s/step": 7.14}
+{"step": 175, "loss": 0.3356, "kl": 0.2829, "reg_d": 0.0527, "q_nnz": 7.93, "d_nnz": 94.9, "acc": 0.89, "q_ent_nnz": 0.55, "d_ent_nnz": 5.195, "ent_weight": 0.0684, "s/step": 7.05}
+{"step": 200, "loss": 0.2816, "kl": 0.2433, "reg_d": 0.0383, "q_nnz": 8.63, "d_nnz": 67.4225, "acc": 0.835, "q_ent_nnz": 0.62, "d_ent_nnz": 5.455, "ent_weight": 0.0701, "s/step": 6.97}
+{"step": 225, "loss": 0.213, "kl": 0.1699, "reg_d": 0.0431, "q_nnz": 9.725, "d_nnz": 76.08, "acc": 0.92, "q_ent_nnz": 0.63, "d_ent_nnz": 5.695, "ent_weight": 0.0731, "s/step": 6.93}
+{"step": 250, "loss": 0.1845, "kl": 0.1393, "reg_d": 0.0452, "q_nnz": 9.015, "d_nnz": 80.58, "acc": 0.915, "q_ent_nnz": 0.625, "d_ent_nnz": 5.28, "ent_weight": 0.0763, "s/step": 6.88}
+{"step": 275, "loss": 0.2025, "kl": 0.1532, "reg_d": 0.0493, "q_nnz": 8.61, "d_nnz": 88.945, "acc": 0.93, "q_ent_nnz": 0.555, "d_ent_nnz": 5.445, "ent_weight": 0.0768, "s/step": 6.85}
+{"step": 300, "loss": 0.2024, "kl": 0.1546, "reg_d": 0.0478, "q_nnz": 8.16, "d_nnz": 86.4775, "acc": 0.92, "q_ent_nnz": 0.575, "d_ent_nnz": 5.49, "ent_weight": 0.0767, "s/step": 6.83}
+done in 34.2 min
+[11:59:46] eval dyvo_link_learned
+
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 100/100 [00:00<00:00, 7332.96it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: /home/user/data/models/distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_projector.bias    | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+vocab_transform.weight  | UNEXPECTED |  | 
+vocab_projector.weight  | UNEXPECTED |  | 
+vocab_transform.bias    | UNEXPECTED |  | 
+vocab_layer_norm.weight | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+Loading weights:   0%|          | 0/106 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 106/106 [00:00<00:00, 5478.36it/s]
+  encoded 32/8067 (1s)
+  encoded 3232/8067 (236s)
+  encoded 6432/8067 (547s)
+  encoded 32/2000 (0s)
+{
+ "agg": {
+  "nDCG@10": 76.67430491530737,
+  "nDCG@20": 77.83051581187455,
+  "R@100": 97.2,
+  "R@1000": 98.85000000000001,
+  "RR@10": 72.76458333333332
+ },
+ "stats": {
+  "q_words": 8.7575,
+  "q_ents": 0.6485,
+  "d_words": 95.40287591421843,
+  "d_ents": 5.831783810586339,
+  "flops": 1.8122132143297522,
+  "flops_ent": 0.0015679310772282163,
+  "index_postings": 816660
+ },
+ "ms_per_query": 1.1568703651428223
+}
+### Headline reproduction (paper Table 1 analogue)
+
+| Model | nDCG@10 | nDCG@20 | R@100 | R@1k | MRR@10 | doc words/ents \| q words/ents \| FLOPs |
+|---|---|---|---|---|---|---|
+| BM25 | 84.25 | 84.81 | 97.95 | 99.15 | 81.47 | – |
+| LSR-w stage-0 init (no distillation) | 80.43† | 81.22 | 97.60 | 99.25 | 76.81 | 156 / 0.0 | 11.2 / 0.0 | 4.38 |
+| LSR-w | 78.41 | 79.34 | 97.35 | 98.85 | 74.82 | 98 / 0.0 | 9.3 / 0.0 | 2.14 |
+| DyVo (linked entities, Wikipedia2Vec) | 77.75 | 78.73 | 97.65 | 99.10 | 73.90 | 102 / 7.4 | 10.6 / 0.7 | 3.21 |
+
+### Candidate source & Ext-A noise robustness (paper Table 2 analogue)
+
+| Model | nDCG@10 | nDCG@20 | R@100 | R@1k | MRR@10 | doc words/ents \| q words/ents \| FLOPs |
+|---|---|---|---|---|---|---|
+| DyVo – linked (precision) | 77.75 | 78.73 | 97.65 | 99.10 | 73.90 | 102 / 7.4 | 10.6 / 0.7 | 3.21 |
+| DyVo – link ∪ dense top-10/20 (recall, noisy) | 76.40‡ | 77.31 | 96.90 | 98.80 | 72.36 | 88 / 10.3 | 9.5 / 3.1 | 2.22 |
+|   … same model, 3x test-time noise (top-30/30) | 76.44‡ | 77.35 | 96.90 | 98.80 | 72.41 | 88 / 14.0 | 9.5 / 9.6 | 2.31 |
+| DyVo-Gate (Ext-A) – link ∪ dense | 78.48 | 79.27 | 97.65 | 98.90 | 74.61 | 110 / 0.2 | 9.0 / 10.6 | 2.02 |
+|   … same model, 3x test-time noise (top-30/30) | 78.48 | 79.27 | 97.65 | 98.90 | 74.61 | 110 / 0.2 | 9.0 / 30.4 | 2.02 |
+
+### Entity embeddings (paper Table 3 analogue)
+
+| Model | nDCG@10 | nDCG@20 | R@100 | R@1k | MRR@10 | doc words/ents \| q words/ents \| FLOPs |
+|---|---|---|---|---|---|---|
+| Wikipedia2Vec (100d, frozen, projected) | 77.75 | 78.73 | 97.65 | 99.10 | 73.90 | 102 / 7.4 | 10.6 / 0.7 | 3.21 |
+| Static learned table (Ext-B control) | 76.67‡ | 77.83 | 97.20 | 98.85 | 72.76 | 95 / 5.8 | 8.8 / 0.6 | 1.81 |
+
+### Candidate quality
+
+| Candidate source (test queries) | avg #cands | gold-article-entity recall |
+|---|---|---|
+| WikiLinker (REL analogue) | 0.7 | 16.9% |
+| Dense W2V top-10 (LaQue analogue) | 10.0 | 4.8% |
+| Dense W2V top-30 | 30.0 | 7.6% |
+| Linker ∪ dense top-10 | 10.7 | 20.0% |
+
+### Linking consistency (nDCG@10 by query group)
+
+| Query group | #q | LSR-w | DyVo (link) | DyVo (link+dense) | DyVo-Gate |
+|---|---|---|---|---|---|
+| no linked query entity | 900 | 73.12 | 72.09 | 71.23 | 73.91 |
+| query entity linked, absent from gold doc | 174 | 74.44 | 65.94 | 72.51 | 76.21 |
+| query entity also linked in gold doc | 926 | 84.30 | 85.46 | 82.16 | 83.34 |
+
+### Ext-B: dynamic vocabulary and unseen entities
+
+| Query group | #q | LSR-w | DyVo (frozen W2V, dynamic) | DyVo (static learned table) |
+|---|---|---|---|---|
+| no entity linked | 900 | 73.12 | 72.09 | 70.89 |
+| all entities seen in training | 646 | 80.24 | 78.33 | 77.77 |
+| >=1 unseen entity | 454 | 86.29 | 88.13 | 86.59 |
+
+Test-time vocabulary restriction of the same DyVo model (entities never seen in training removed from the index = a static vocabulary):
+
+| Vocabulary | all queries nDCG@10 | >=1-unseen-entity queries nDCG@10 |
+|---|---|---|
+| dynamic (all Wikipedia entities) | 77.75 | 88.13 |
+| static (training entities only) | 77.30 | 86.16 |
+
+On >=1-unseen-entity queries: dynamic vs static p=0.0017; DyVo vs LSR-w p=0.0094 (paired t-test).
+
+16686 distinct entities seen in training; 420 distinct test-query entities unseen.
+
+† / ‡ : significantly better / worse than LSR-w (paired t-test on nDCG@10, p<0.05).
+[12:12:33] ALL DONE

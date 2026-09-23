@@ -1,0 +1,8 @@
+/home/user/work/squad/queries_test.jsonl: 2000 texts, 0.72 entities/text -> /home/user/work/squad/queries_test.ent_link.jsonl
+/home/user/work/squad/queries_val.jsonl: 500 texts, 0.73 entities/text -> /home/user/work/squad/queries_val.ent_link.jsonl
+/home/user/work/squad/queries_train10k.jsonl: 10000 texts, 0.72 entities/text -> /home/user/work/squad/queries_train10k.ent_link.jsonl
+/home/user/work/squad/corpus.jsonl: 20963 texts, 7.28 entities/text -> /home/user/work/squad/corpus.ent_link.jsonl
+/home/user/work/squad/queries_test.jsonl: 2000 texts, 30.00 entities/text -> /home/user/work/squad/queries_test.ent_dense.jsonl
+/home/user/work/squad/queries_val.jsonl: 500 texts, 30.00 entities/text -> /home/user/work/squad/queries_val.ent_dense.jsonl
+/home/user/work/squad/queries_train10k.jsonl: 10000 texts, 30.00 entities/text -> /home/user/work/squad/queries_train10k.ent_dense.jsonl
+Killed

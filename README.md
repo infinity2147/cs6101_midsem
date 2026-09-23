@@ -36,7 +36,11 @@ entities without retraining.
 | `dyvo/data.py`, `dyvo/bm25.py`, `dyvo/metrics.py` | SQuAD-Open-Para benchmark, BM25 baseline, nDCG/R/MRR (checked against `ir_measures`) |
 | `dyvo/paper_data.py` | converters for the **paper's datasets** (Robust04 / Core18 / CODEC + authors' `lsr42/dyvo_data`) |
 | `dyvo/analysis.py` | builds the result tables, significance tests, Ext-B breakdown and figures |
-| `scripts/run_squad_experiments.sh` | whole CPU pipeline end to end |
+| `dyvo/prep.py`, `dyvo/significance.py` | stage-0 / evaluation-corpus preparation; every p-value in the report |
+| `scripts/reproduce_midsem.sh` | **the exact end-to-end sequence behind the mid-sem results** (calls `run_cpu_budget.sh`) |
+| `scripts/restore_artifacts.py` | unpack `artifacts/` to recompute all tables and p-values without training |
+| `artifacts/` | **all derived data, per-model metrics (per query), encoded indexes, runs and logs**, see `artifacts/README.md` |
+| `scripts/run_squad_experiments.sh` | longer full-budget variant of the pipeline |
 | `configs/paper_datasets.md` | how to run the paper's headline experiment on a GPU |
 
 ## Quick start
@@ -46,6 +50,10 @@ pip install -r requirements.txt
 # downloads: DistilBERT + monoT5-base (legacy HF S3), SQuAD v1.1, Wikipedia2Vec enwiki_20180420_100d
 bash scripts/download.sh
 python -m dyvo.w2v --src data/w2v/enwiki_20180420_100d.txt.bz2 --out data/w2v/converted
-bash scripts/run_cpu_budget.sh               # exactly what produced the mid-sem numbers (~5 h, 4 CPU cores)
-# scripts/run_squad_experiments.sh is the longer full-budget version
+bash scripts/reproduce_midsem.sh             # exactly what produced the mid-sem numbers (~5-6 h, 4 CPU cores)
+
+# or, without re-training: recompute every table / p-value from the committed artifacts
+python scripts/restore_artifacts.py --work work/squad --runs work/runs
+python -m dyvo.analysis --runs work/runs --work work/squad --w2v data/w2v/converted --out report/results
+python -m dyvo.significance --runs work/runs --work work/squad
 ```

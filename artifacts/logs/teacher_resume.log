@@ -1,0 +1,13 @@
+
+Loading weights:   0%|          | 0/260 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 260/260 [00:00<00:00, 16966.72it/s]
+resuming: 3792 done, 1400 left
+8/1400 triples, 0.7 triples/s
+168/1400 triples, 1.0 triples/s
+328/1400 triples, 1.0 triples/s
+488/1400 triples, 1.0 triples/s
+648/1400 triples, 1.0 triples/s
+808/1400 triples, 1.0 triples/s
+968/1400 triples, 0.9 triples/s
+1128/1400 triples, 0.9 triples/s
+1288/1400 triples, 0.9 triples/s
