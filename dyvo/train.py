@@ -15,9 +15,13 @@ import torch
 import torch.nn.functional as F
 from transformers import AutoTokenizer
 
+from . import bf16_ok
 from .data import doc_text, read_jsonl
 from .entity_store import EntityStore
 from .model import DyVo, entity_scores_all
+
+BF16 = bf16_ok()
+
 
 def stems(args):
     return ["corpus", getattr(args, "train_queries", "queries_train10k"), "queries_test", "queries_val"]
@@ -172,7 +176,7 @@ def main():
             dids = [d for t in batch for d in (t["pos"], t["neg"])]
             db = coll.docs([docs[d] for d in dids], dids)
             teacher = torch.tensor([[t["pos_score"], t["neg_score"]] for t in batch])
-            with torch.autocast("cpu", dtype=torch.bfloat16):
+            with torch.autocast("cpu", dtype=torch.bfloat16, enabled=BF16):
                 s_pairs, s_all, qw, dw, qe, de = score_pairs(model, qb, db, B)
             s_pairs, s_all = s_pairs.float(), s_all.float()
             kl = F.kl_div(F.log_softmax(s_pairs, 1), F.softmax(teacher, 1), reduction="batchmean")

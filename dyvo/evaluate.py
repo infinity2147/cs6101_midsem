@@ -15,7 +15,7 @@ import torch
 from scipy import sparse
 from transformers import AutoTokenizer
 
-from . import WORD_VOCAB_SIZE
+from . import WORD_VOCAB_SIZE, bf16_ok
 from .data import doc_text, read_jsonl, read_qrels, write_run
 from .metrics import aggregate, per_query
 from .train import Collator, build_model, build_store
@@ -33,7 +33,7 @@ def encode(model, coll, items, is_doc, batch_size=32):
         tids = [items[i][0] for i in idx]
         texts = [items[i][1] for i in idx]
         batch = coll.docs(texts, tids) if is_doc else coll.queries(texts, tids)
-        with torch.autocast("cpu", dtype=torch.bfloat16):
+        with torch.autocast("cpu", dtype=torch.bfloat16, enabled=bf16_ok()):
             w, e = (model.encode_d if is_doc else model.encode_q)(batch)
         w = w.float()
         r, c = w.nonzero(as_tuple=True)
@@ -127,7 +127,8 @@ def main():
     model.eval()
     coll = Collator(tok, store, d_len=args.d_len)
 
-    corpus = read_jsonl(os.path.join(args.data, "corpus.jsonl"))
+    cpath = os.path.join(args.data, "corpus_test.jsonl")  # evaluation corpus (subset), if present
+    corpus = read_jsonl(cpath if os.path.exists(cpath) else os.path.join(args.data, "corpus.jsonl"))
     queries = read_jsonl(os.path.join(args.data, f"queries_{a.split}.jsonl"))
     qrels = read_qrels(os.path.join(args.data, f"qrels_{a.split}.txt"))
     dpath = os.path.join(a.model_dir, f"reps_docs{rep_tag}.npz")

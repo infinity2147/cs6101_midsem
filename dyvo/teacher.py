@@ -14,17 +14,18 @@ import torch
 import sentencepiece as spm
 from transformers import T5ForConditionalGeneration
 
+from . import bf16_ok
 from .data import doc_text, read_jsonl, read_qrels, read_run
 
 
 class MonoT5:
-    def __init__(self, path, device="cpu", max_length=384, bf16=True):
+    def __init__(self, path, device="cpu", max_length=384, bf16=None):
         # SentencePiece directly: transformers>=5 T5Tokenizer(vocab_file=...) mis-tokenizes
         self.sp = spm.SentencePieceProcessor(model_file=f"{path}/spiece.model")
         self.model = T5ForConditionalGeneration.from_pretrained(path).eval().to(device)
         self.device = device
         self.max_length = max_length
-        self.bf16 = bf16  # CPU AMX/avx512-bf16 autocast: ~3x faster, scores match fp32 closely
+        self.bf16 = bf16_ok() if bf16 is None else bf16  # CPU AMX/avx512-bf16 autocast: ~3x faster, scores match fp32 closely
         self.true_id = self.sp.piece_to_id("▁true")    # 1176
         self.false_id = self.sp.piece_to_id("▁false")  # 6136
 
@@ -66,8 +67,10 @@ if __name__ == "__main__":
     ap.add_argument("--out", required=True)
     ap.add_argument("--n_queries", type=int, default=16000)
     ap.add_argument("--batch_size", type=int, default=32)
+    ap.add_argument("--max_new", type=int, default=None)
+    ap.add_argument("--threads", type=int, default=3)
     a = ap.parse_args()
-    torch.set_num_threads(3)
+    torch.set_num_threads(a.threads)
     docs = {d["id"]: doc_text(d) for d in read_jsonl(a.corpus)}
     queries = read_jsonl(a.queries)[: a.n_queries]
     qtext = {q["id"]: q["text"] for q in queries}
@@ -84,6 +87,10 @@ if __name__ == "__main__":
             except json.JSONDecodeError:
                 pass
     triples = [t for t in triples if t not in done]
+    if a.max_new is not None:  # random subset of the remaining triples (avoids length bias)
+        random.Random(0).shuffle(triples)
+        triples = triples[:a.max_new]
+        triples.sort(key=lambda t: len(docs[t[1]]) + len(docs[t[2]]))
     print(f"resuming: {len(done)} done, {len(triples)} left", flush=True)
     t0 = time.time()
     with open(a.out, "a") as f:

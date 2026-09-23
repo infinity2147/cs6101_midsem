@@ -54,10 +54,21 @@ def bm25_res(work):
     return {"agg": aggregate(pq), "per_query": pq}
 
 
-def seen_entities(work, source):
+def training_triples(model_dir):
+    """exactly the triples a run was trained on (same selection as dyvo.train)."""
+    import random
+    args = json.load(open(os.path.join(model_dir, "args.json")))
+    triples = read_jsonl(args["triples"])
+    triples.sort(key=lambda t: t["qid"])
+    random.Random(0).shuffle(triples)
+    qids = {q["id"] for q in read_jsonl(os.path.join(args["data"], f"{args['train_queries']}.jsonl"))}
+    return [t for t in triples if t["qid"] in qids][args["triple_start"]:args["triple_end"]]
+
+
+def seen_entities(work, source, model_dir):
     """entity rows appearing in any *training* text's candidates (train queries + their docs)."""
     st = EntityStore(work, ["corpus", "queries_train10k"], source=source)
-    triples = read_jsonl(os.path.join(work, "train_triples_monot5.jsonl"))
+    triples = training_triples(model_dir)
     train_docs = {t["pos"] for t in triples} | {t["neg"] for t in triples}
     train_q = {t["qid"] for t in triples}
     seen = set()
@@ -70,7 +81,7 @@ def seen_entities(work, source):
 def ext_b(runs, work, out):
     lines = []
     link = {r["id"]: r for r in read_jsonl(os.path.join(work, "queries_test.ent_link.jsonl"))}
-    seen = seen_entities(work, "link")
+    seen = seen_entities(work, "link", os.path.join(runs, "dyvo_link_w2v"))
     groups = {"no entity linked": [], "all entities seen in training": [], ">=1 unseen entity": []}
     for qid, r in link.items():
         ents = r["entities"]
@@ -98,7 +109,8 @@ def ext_b(runs, work, out):
         keep = np.array([WORD_VOCAB_SIZE + st.row2id[e] for e in seen if e in st.row2id])
         D = sparse.load_npz(os.path.join(d, "reps_docs.npz"))
         Q = sparse.load_npz(os.path.join(d, "reps_queries_test.npz"))
-        corpus = [x["id"] for x in read_jsonl(os.path.join(work, "corpus.jsonl"))]
+        cp = os.path.join(work, "corpus_test.jsonl")
+        corpus = [x["id"] for x in read_jsonl(cp if os.path.exists(cp) else os.path.join(work, "corpus.jsonl"))]
         qids = [x["id"] for x in read_jsonl(os.path.join(work, "queries_test.jsonl"))]
         qrels = read_qrels(os.path.join(work, "qrels_test.txt"))
         run, _ = retrieve(mask_entities(Q, keep), mask_entities(D, keep), corpus, qids)
