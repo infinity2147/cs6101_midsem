@@ -1,0 +1,9 @@
+torch>=2.1
+transformers>=4.40
+sentencepiece
+numpy
+scipy
+ir-measures
+matplotlib
+# only for the paper's datasets (GPU path):
+# ir_datasets
