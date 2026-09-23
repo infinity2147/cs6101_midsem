@@ -35,6 +35,7 @@ entities without retraining.
 | `dyvo/teacher.py` | monoT5 cross-encoder teacher (bf16 on CPU) |
 | `dyvo/data.py`, `dyvo/bm25.py`, `dyvo/metrics.py` | SQuAD-Open-Para benchmark, BM25 baseline, nDCG/R/MRR (checked against `ir_measures`) |
 | `dyvo/paper_data.py` | converters for the **paper's datasets** (Robust04 / Core18 / CODEC + authors' `lsr42/dyvo_data`) |
+| `tests/test_core.py` | unit tests: batched entity scoring, pooling speed-up, DyVo head and gate match the reference maths |
 | `dyvo/analysis.py` | builds the result tables, significance tests, Ext-B breakdown and figures |
 | `dyvo/prep.py`, `dyvo/significance.py` | stage-0 / evaluation-corpus preparation; every p-value in the report |
 | `scripts/reproduce_midsem.sh` | **the exact end-to-end sequence behind the mid-sem results** (calls `run_cpu_budget.sh`) |
