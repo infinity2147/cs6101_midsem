@@ -320,3 +320,21 @@ than the paper's +2 to +3.5 nDCG@10.
    table. Compare quality and cost with the linker.
 5. **Efficiency.** A real inverted index (e.g. PISA or Anserini impact index) to measure latency
    and posting-list lengths of entity terms against word pieces.
+
+## 7. Reproducibility: where every number comes from
+
+| What | Where |
+|---|---|
+| Code for every step | `dyvo/` (documented per module in the README) |
+| Exact command sequence that produced this report | `scripts/reproduce_midsem.sh` → `scripts/run_cpu_budget.sh` |
+| Derived data (queries, qrels, corpora, entity candidates, teacher-scored triples, BM25 runs) | `artifacts/data/` |
+| Per-model training args, training logs, per-query metrics, encoded indexes, ranked runs | `artifacts/runs/<model>/` |
+| Raw run logs (with timestamps) | `artifacts/logs/` |
+| Tables and figure in this report | `report/results/tables.md`, `where_dyvo_helps.png` (from `python -m dyvo.analysis`) |
+| Every p-value quoted | `report/results/significance.json` (from `python -m dyvo.significance`) |
+| Unit tests for the model maths | `tests/test_core.py` (`python -m pytest -q tests`) |
+
+To recompute all tables and p-values without training:
+`python scripts/restore_artifacts.py && python -m dyvo.analysis … && python -m dyvo.significance …`
+(see `artifacts/README.md`). Model checkpoints (~510 MB each) are not in the repository because of
+GitHub's 100 MB file limit; `reproduce_midsem.sh` retrains them deterministically (seed 42).

@@ -56,4 +56,6 @@ bash scripts/reproduce_midsem.sh             # exactly what produced the mid-sem
 python scripts/restore_artifacts.py --work work/squad --runs work/runs
 python -m dyvo.analysis --runs work/runs --work work/squad --w2v data/w2v/converted --out report/results
 python -m dyvo.significance --runs work/runs --work work/squad
+
+python -m pytest -q tests                    # unit tests: our implementation == reference maths
 ```
