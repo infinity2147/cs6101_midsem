@@ -132,6 +132,31 @@ def ext_b(runs, work, out):
     return "\n".join(lines)
 
 
+def consistency(runs, work):
+    """Linking-consistency breakdown: DyVo can only help when the query's linked entity is also a
+    candidate of the relevant document; inconsistent linking actively hurts."""
+    ql = {r["id"]: set(r["entities"]) for r in read_jsonl(os.path.join(work, "queries_test.ent_link.jsonl"))}
+    dl = {r["id"]: set(r["entities"]) for r in read_jsonl(os.path.join(work, "corpus.ent_link.jsonl"))}
+    qrels = read_qrels(os.path.join(work, "qrels_test.txt"))
+    groups = {"no linked query entity": [], "query entity linked, absent from gold doc": [],
+              "query entity also linked in gold doc": []}
+    for q, rel in qrels.items():
+        g = next(iter(rel))
+        k = ("no linked query entity" if not ql[q] else
+             "query entity also linked in gold doc" if ql[q] & dl.get(g, set()) else
+             "query entity linked, absent from gold doc")
+        groups[k].append(q)
+    models = [("LSR-w", "lsr_w"), ("DyVo (link)", "dyvo_link_w2v"), ("DyVo (link+dense)", "dyvo_linkdense_w2v"),
+              ("DyVo-Gate", "dyvo_linkdense_gate")]
+    models = [(l, n, load(runs, n)) for l, n in models if load(runs, n)]
+    lines = ["| Query group | #q | " + " | ".join(l for l, _, _ in models) + " |",
+             "|---|---|" + "---|" * len(models)]
+    for g, qs in groups.items():
+        cells = [f"{100 * np.mean([r['per_query'][q]['nDCG@10'] for q in qs]):.2f}" for _, _, r in models]
+        lines.append(f"| {g} | {len(qs)} | " + " | ".join(cells) + " |")
+    return "\n".join(lines)
+
+
 def cand_quality(work, w2v_dir):
     names = open(os.path.join(w2v_dir, "entities.txt"), encoding="utf-8").read().split("\n")
     idx = {n: i for i, n in enumerate(names)}
@@ -210,6 +235,7 @@ def main():
                      ("R3", "Entity embeddings (paper Table 3 analogue)")]:
         text += [f"### {title}", "", *R[k], ""]
     text += ["### Candidate quality", "", cand_quality(a.work, a.w2v), ""]
+    text += ["### Linking consistency (nDCG@10 by query group)", "", consistency(a.runs, a.work), ""]
     try:
         text += ["### Ext-B: dynamic vocabulary and unseen entities", "", ext_b(a.runs, a.work, a.out), ""]
     except Exception as e:  # partial results
