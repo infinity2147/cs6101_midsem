@@ -126,6 +126,12 @@ def ext_b(runs, work, out):
         for lab, p in [("dynamic (all Wikipedia entities)", full), ("static (training entities only)", pq)]:
             lines.append(f"| {lab} | {100 * np.mean([p[q]['nDCG@10'] for q in p]):.2f} | "
                          f"{100 * np.mean([p[q]['nDCG@10'] for q in uq]):.2f} |")
+        from scipy import stats
+        pv = stats.ttest_rel([full[q]["nDCG@10"] for q in uq], [pq[q]["nDCG@10"] for q in uq]).pvalue
+        pl = stats.ttest_rel([full[q]["nDCG@10"] for q in uq],
+                             [res["lsr_w"]["per_query"][q]["nDCG@10"] for q in uq]).pvalue
+        lines.append(f"\nOn >=1-unseen-entity queries: dynamic vs static p={pv:.4f}; DyVo vs LSR-w p={pl:.4f} "
+                     "(paired t-test).")
         lines.append(f"\n{len(seen)} distinct entities seen in training; "
                      f"{sum(1 for e in {x for r in link.values() for x in r['entities']} if e not in seen)} "
                      f"distinct test-query entities unseen.")
@@ -175,25 +181,52 @@ def cand_quality(work, w2v_dir):
     return "\n".join(lines)
 
 
-def plots(runs, out):
+def plots(runs, work, out):
+    """Where does DyVo help? nDCG@10 by query group (linking consistency; unseen entities)."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    fig, ax = plt.subplots(figsize=(6, 3.6))
-    for name, lab, c in [("lsr_init", "stage-0 LSR init", "#999999"), ("lsr_w", "LSR-w", "#4C72B0"),
-                         ("dyvo_link_w2v", "DyVo (linked, W2V)", "#DD8452"),
-                         ("dyvo_linkdense_w2v", "DyVo (link+dense)", "#55A868"),
-                         ("dyvo_linkdense_gate", "DyVo-Gate (Ext-A)", "#C44E52")]:
-        p = os.path.join(runs, name, "train_log.json")
-        if not os.path.exists(p):
-            continue
-        log = json.load(open(p))
-        k = np.array([r["kl"] for r in log])
-        sm = np.convolve(k, np.ones(25) / 25, mode="valid")
-        ax.plot(sm, label=lab, color=c, lw=1.4)
-    ax.set_xlabel("step"); ax.set_ylabel("KL to monoT5 (smoothed)"); ax.legend(fontsize=8, frameon=False)
-    ax.spines[["top", "right"]].set_visible(False)
-    fig.tight_layout(); fig.savefig(os.path.join(out, "training_curves.png"), dpi=150)
+    from scipy import sparse as _sp  # noqa: F401
+    C = ["#2a78d6", "#eb6834", "#1baf7a"]      # validated categorical slots 1-3 (dataviz palette)
+    ql = {r["id"]: set(r["entities"]) for r in read_jsonl(os.path.join(work, "queries_test.ent_link.jsonl"))}
+    dl = {r["id"]: set(r["entities"]) for r in read_jsonl(os.path.join(work, "corpus.ent_link.jsonl"))}
+    qrels = read_qrels(os.path.join(work, "qrels_test.txt"))
+    seen = seen_entities(work, "link", os.path.join(runs, "dyvo_link_w2v"))
+    g = {"no linked\nentity": [], "linked, consistent\nwith gold doc": [], "linked, absent\nfrom gold doc": [],
+         "\u22651 entity unseen\nin training": []}
+    for q, rel in qrels.items():
+        d = next(iter(rel))
+        if not ql[q]:
+            g["no linked\nentity"].append(q)
+        elif ql[q] & dl.get(d, set()):
+            g["linked, consistent\nwith gold doc"].append(q)
+        else:
+            g["linked, absent\nfrom gold doc"].append(q)
+        if ql[q] and any(e not in seen for e in ql[q]):
+            g["\u22651 entity unseen\nin training"].append(q)
+    models = [("LSR-w", "lsr_w"), ("DyVo (linked)", "dyvo_link_w2v"), ("DyVo-Gate (Ext-A)", "dyvo_linkdense_gate")]
+    res = {n: load(runs, n) for _, n in models}
+    fig, ax = plt.subplots(figsize=(8, 3.8), facecolor="#fcfcfb")
+    ax.set_facecolor("#fcfcfb")
+    w = 0.26
+    for k, (lab, n) in enumerate(models):
+        vals = [100 * np.mean([res[n]["per_query"][q]["nDCG@10"] for q in qs]) for qs in g.values()]
+        xs = np.arange(len(g)) + (k - 1) * (w + 0.02)
+        ax.bar(xs, vals, w, color=C[k], label=lab, zorder=2)
+        for x, v in zip(xs, vals):
+            ax.text(x, v + 0.4, f"{v:.1f}", ha="center", va="bottom", fontsize=7, color="#52514e")
+    ax.set_xticks(np.arange(len(g)))
+    ax.set_xticklabels([f"{k}\n(n={len(v)})" for k, v in g.items()], fontsize=8, color="#0b0b0b")
+    ax.set_ylim(60, 92)
+    ax.set_ylabel("nDCG@10", color="#52514e")
+    ax.grid(axis="y", color="#e6e5e1", lw=0.8, zorder=0)
+    ax.spines[["top", "right", "left"]].set_visible(False)
+    ax.tick_params(axis="y", colors="#52514e", length=0)
+    ax.legend(frameon=False, fontsize=8, ncol=3, loc="upper left")
+    ax.set_title("Where do entities help? nDCG@10 by query group (SQuAD-Open-Para test)", fontsize=10,
+                 loc="left", color="#0b0b0b")
+    fig.tight_layout()
+    fig.savefig(os.path.join(out, "where_dyvo_helps.png"), dpi=160)
 
 
 def main():
@@ -242,7 +275,7 @@ def main():
         text += [f"(Ext-B pending: {e})"]
     text += ["† / ‡ : significantly better / worse than LSR-w (paired t-test on nDCG@10, p<0.05)."]
     open(os.path.join(a.out, "tables.md"), "w").write("\n".join(text))
-    plots(a.runs, a.out)
+    plots(a.runs, a.work, a.out)
     summ = {}
     for p in glob.glob(os.path.join(a.runs, "*", "metrics_*.json")):
         r = json.load(open(p))

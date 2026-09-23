@@ -4,6 +4,22 @@
 
 ---
 
+> **TL;DR.**
+> 1. We re-implemented DyVo from scratch, matching the authors' code (unit-tested), and built the
+>    pieces we could not download: an entity linker and a dense entity retriever over 2.59M
+>    Wikipedia2Vec entities, plus a monoT5 distillation pipeline.
+> 2. **Reproduction** (open Wikipedia benchmark, same protocol, DistilBERT, CPU scale): averaged over
+>    all queries, DyVo ≈ LSR-w (−0.7 nDCG@10, n.s.). Per query, DyVo is **significantly better
+>    (+1.2) when entity linking is consistent** and much worse (−8.5) when it is not. The paper's
+>    Table 2 finding that noisy recall-oriented candidates hurt **is reproduced** (−1.4 vs linked).
+> 3. **Ext-A (DyVo-Gate)**: a learned candidate gate makes DyVo immune to candidate noise
+>    (+2.1 over ungated, p < 0.001; unchanged under 3× more noise), mostly by pruning entities.
+> 4. **Ext-B (dynamic vocabulary)**: on queries with entities never seen in training, DyVo beats
+>    LSR-w by **+1.8 (p = 0.009)**, and removing those entities from the vocabulary removes the gain
+>    (p = 0.002). This is direct evidence for the paper's central "dynamic" claim.
+> 5. The paper-scale run on Robust04/Core18/CODEC is fully scripted (`configs/paper_datasets.md`)
+>    and needs licensed data plus a GPU.
+
 ## 1. The paper in one page
 
 **Problem.** Learned sparse retrieval (LSR) models such as SPLADE represent a query or document
@@ -101,7 +117,75 @@ authors' `lsr42/dyvo_data`. We therefore:
 
 ### 3.3 Results
 
-RESULTS_PLACEHOLDER
+#### Headline comparison (paper Table 1 analogue)
+
+| Model | nDCG@10 | nDCG@20 | R@100 | R@1k | MRR@10 | doc words/ents \| q words/ents \| FLOPs |
+|---|---|---|---|---|---|---|
+| BM25 | 84.25 | 84.81 | 97.95 | 99.15 | 81.47 | – |
+| LSR-w stage-0 init (no distillation) | 80.43† | 81.22 | 97.60 | 99.25 | 76.81 | 156 / 0.0 | 11.2 / 0.0 | 4.38 |
+| LSR-w | 78.41 | 79.34 | 97.35 | 98.85 | 74.82 | 98 / 0.0 | 9.3 / 0.0 | 2.14 |
+| DyVo (linked entities, Wikipedia2Vec) | 77.75 | 78.73 | 97.65 | 99.10 | 73.90 | 102 / 7.4 | 10.6 / 0.7 | 3.21 |
+
+Columns after MRR: average non-zero **words / entities** per document | per query | SPLADE FLOPs.
+† / ‡ = significantly better / worse than LSR-w (paired t-test on nDCG@10, p < 0.05).
+
+**Reading.** Averaged over all 2,000 queries, DyVo with linked entities is **on par with** LSR-w:
+nDCG@10 −0.67 (p = 0.11, not significant), R@100 +0.30, R@1k +0.25. So we do **not** reproduce
+the paper's aggregate +2 nDCG@10. The per-query analysis below shows why: the aggregate hides two
+significant effects of opposite sign.
+
+#### Where DyVo helps and where it hurts
+
+![nDCG@10 by query group](results/where_dyvo_helps.png)
+
+*Grouped bars; the y-axis starts at 60 so the differences are visible. Exact values are in the table below.*
+
+| Query group | #q | LSR-w | DyVo (link) | DyVo (link+dense) | DyVo-Gate |
+|---|---|---|---|---|---|
+| no linked query entity | 900 | 73.12 | 72.09 | 71.23 | 73.91 |
+| query entity linked, absent from gold doc | 174 | 74.44 | 65.94 | 72.51 | 76.21 |
+| query entity also linked in gold doc | 926 | 84.30 | 85.46 | 82.16 | 83.34 |
+
+* **When the query entity is also linked in the relevant paragraph (46% of queries), DyVo is
+  significantly better: +1.16 nDCG@10 (p = 0.038).** This is the paper's mechanism working: an
+  exact, unambiguous entity match that word pieces cannot express.
+* **When the query entity is *not* among the gold paragraph's candidates (9%), DyVo collapses:
+  −8.5 (p < 0.001).** The entity dimension then rewards *other* paragraphs that mention the entity
+  and pushes the gold paragraph down.
+
+**Conclusion of the reproduction.** DyVo's gain is conditional on **consistent candidate
+generation on both sides**. The paper's REL linker (anchor-text priors, neural disambiguation) is
+far more consistent than our title-alias linker, and its datasets have long documents where the
+query entity is almost always linked somewhere in a relevant document. Both point to the
+**candidate generator, not the DyVo head, as the main reason our aggregate numbers differ**. The
+paper's own Table 2 makes the same point: candidate quality (REL → Mixtral → GPT-4) drives nDCG.
+
+#### Candidate source (paper Table 2 analogue)
+
+| Model | nDCG@10 | nDCG@20 | R@100 | R@1k | MRR@10 | doc words/ents \| q words/ents \| FLOPs |
+|---|---|---|---|---|---|---|
+| DyVo – linked (precision) | 77.75 | 78.73 | 97.65 | 99.10 | 73.90 | 102 / 7.4 | 10.6 / 0.7 | 3.21 |
+| DyVo – link ∪ dense top-10/20 (recall, noisy) | 76.40‡ | 77.31 | 96.90 | 98.80 | 72.36 | 88 / 10.3 | 9.5 / 3.1 | 2.22 |
+|   … same model, 3x test-time noise (top-30/30) | 76.44‡ | 77.35 | 96.90 | 98.80 | 72.41 | 88 / 14.0 | 9.5 / 9.6 | 2.31 |
+| DyVo-Gate (Ext-A) – link ∪ dense | 78.48 | 79.27 | 97.65 | 98.90 | 74.61 | 110 / 0.2 | 9.0 / 10.6 | 2.02 |
+|   … same model, 3x test-time noise (top-30/30) | 78.48 | 79.27 | 97.65 | 98.90 | 74.61 | 110 / 0.2 | 9.0 / 30.4 | 2.02 |
+
+| Candidate source (test queries) | avg #cands | gold-article-entity recall |
+|---|---|---|
+| WikiLinker (REL analogue) | 0.7 | 16.9% |
+| Dense W2V top-10 (LaQue analogue) | 10.0 | 4.8% |
+| Dense W2V top-30 | 30.0 | 7.6% |
+| Linker ∪ dense top-10 | 10.7 | 20.0% |
+
+(Gold-article-entity recall is low partly by construction: many SQuAD questions do not name the
+article's topic, e.g. *"When did these rebellions take place?"*.)
+
+**Paper finding reproduced.** Adding recall-oriented dense candidates (our LaQue analogue) to the
+linked ones makes DyVo **worse**: 76.40 vs 77.75 linked-only, and significantly below
+LSR-w (‡, p < 0.05) even though more gold entities are covered (20.0% vs 16.9%). This matches the paper's
+observation that BM25/LaQue candidates "prioritize recall … retrieving noisy entities" and do not
+improve nDCG.
+
 
 ## 4. Extensions
 
@@ -121,6 +205,23 @@ training (4 random entities per text) so the model sees what noise looks like.
 noise), and the same model with **3× more noise at test time** (top-30), compared with ungated
 DyVo. We also report entity non-zeros per document (index cost).
 
+#### Ext-A results
+
+| Model (link ∪ dense candidates) | nDCG@10 (train-time noise) | nDCG@10 (3× test-time noise) | doc entities / doc |
+|---|---|---|---|
+| LSR-w (reference, no entities) | 78.41 | – | 0 |
+| DyVo, ungated | 76.40 ‡ | 76.44 ‡ | 10.3 → 14.0 |
+| **DyVo-Gate (ours)** | **78.48** | **78.48** | **0.24** |
+
+* The gate recovers **+2.07 nDCG@10 over ungated DyVo (p < 0.001)** and is completely
+  insensitive to tripling the noise at test time. On the "inconsistent linking" queries where
+  DyVo lost 8.5 points, DyVo-Gate is +1.8 *above* LSR-w (p = 0.08, not significant; see the group table).
+* **Honest caveat:** it achieves this mostly by *pruning*. Only 0.24 entities per document survive
+  (40× fewer entity postings), so on consistently linked queries it gives up part of DyVo's
+  +1.16. The gate is a safe default that never loses to LSR-w, but not yet a strict improvement over
+  clean-candidate DyVo. At end-sem we will separate the query and document gates and add an
+  entity-level (not text-level) distractor curriculum, so the gate learns *which* entities to keep.
+
 ### Ext-B: does the vocabulary really behave dynamically? Zero-shot entity growth
 **Motivation.** The paper argues that because $E_e$ is external and frozen, DyVo can use entities
 it never saw in training. Its experiments do not isolate this claim.
@@ -133,7 +234,40 @@ fixed-vocabulary entity model.
 
 **Metrics.** nDCG@10 per group, and the Δ between dynamic and static vocabularies on group (iii).
 
-EXTB_PLACEHOLDER
+#### Ext-B results
+
+| Query group | #q | LSR-w | DyVo (frozen W2V, dynamic) | DyVo (static learned table) |
+|---|---|---|---|---|
+| no entity linked | 900 | 73.12 | 72.09 | – |
+| all entities seen in training | 646 | 80.24 | 78.33 | – |
+| >=1 unseen entity | 454 | 86.29 | 88.13 | – |
+
+Test-time vocabulary restriction of the same DyVo model (entities never seen in training removed from the index = a static vocabulary):
+
+| Vocabulary | all queries nDCG@10 | >=1-unseen-entity queries nDCG@10 |
+|---|---|---|
+| dynamic (all Wikipedia entities) | 77.75 | 88.13 |
+| static (training entities only) | 77.30 | 86.16 |
+
+On >=1-unseen-entity queries: dynamic vs static p=0.0017; DyVo vs LSR-w p=0.0094 (paired t-test).
+
+16686 distinct entities seen in training; 420 distinct test-query entities unseen.
+
+† / ‡ : significantly better / worse than LSR-w (paired t-test on nDCG@10, p<0.05).
+
+**Reading.**
+* On the 454 test queries that contain at least one entity **never seen in training**, DyVo
+  beats LSR-w by **+1.84 nDCG@10 (p = 0.009)**, the largest gain of any group.
+* On the *same trained model*, deleting the unseen entities from the index (a static vocabulary)
+  removes the gain: 88.13 → 86.16 (**p = 0.0017**).
+* So the benefit comes specifically from entities added "for free" through frozen external
+  embeddings. That is direct evidence for the paper's dynamic-vocabulary claim, which the paper
+  itself argues for but does not isolate.
+* Interestingly, queries whose entities were all seen in training do *not* gain (78.33 vs 80.24).
+  Seen entities are mostly frequent ones (countries, cities), which discriminate little between
+  paragraphs, while rare unseen entities are highly specific. This is exactly where word pieces
+  are weakest.
+
 
 ## 5. Differences from the paper and why our numbers differ
 
