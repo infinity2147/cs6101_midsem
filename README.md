@@ -4,7 +4,7 @@ Re-implementation, reproduction and extensions of
 **DyVo** (Nguyen, Chatterjee, MacAvaney, Mackie, Dalton, Yates — EMNLP 2024).
 Reference code: <https://github.com/thongnt99/DyVo>.
 
-**Mid-semester report:** [`report/MIDSEM_REPORT.md`](report/MIDSEM_REPORT.md) (web version: `report/midsem_report.html`)
+**Mid-semester report:** [`report/MIDSEM_REPORT.md`](report/MIDSEM_REPORT.md) (PDF: [`report/MIDSEM_REPORT.pdf`](report/MIDSEM_REPORT.pdf), web version: `report/midsem_report.html`; rebuild the PDF with `python scripts/build_pdf.py`)
 (results tables: [`report/results/tables.md`](report/results/tables.md))
 
 ## What DyVo does (one paragraph)
