@@ -1,0 +1,1589 @@
+From e04384abbb812ce5cdd66cb69115aa34ba04bf62 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 24 Sep 2026 11:51:39 +0000
+Subject: [PATCH] Headline reproduction stage: environment/data audit, 3
+ pipeline fixes, report (blocked)
+
+- F1 requirements-lock.txt: drop 7 unused pins that conflict with protobuf==4.25.9 (lock was not installable on Linux)
+- F2 02_check_data.py: corpus check reads a real document; missing corpus is an ERROR (was a false 'ok')
+- F3 LSR-w Robust04/Core18 L1=1e-5 configs: init -> model.safetensors (release ships no pytorch_model.bin)
+- HEADLINE_REPRODUCTION_REPORT.md, results/results.csv (0/46 run), logs/headline/ (all evidence), NOTES/PROGRESS
+
+Verdict: blocked by unavailable data (HF assets, CODEC docs, licensed NIST corpora) and hardware (no GPU, RAM ~ LaQue table).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01EkEtVYXNbWEKJM1pgvc2jC
+---
+ ..._monot53b_distillation_l1_0.0_0.00001.yaml |   4 +-
+ ..._monot53b_distillation_l1_0.0_0.00001.yaml |   4 +-
+ HEADLINE_REPRODUCTION_REPORT.md               | 161 ++++++++++++++++++
+ NOTES.md                                      |  15 ++
+ PROGRESS.md                                   |  12 ++
+ logs/headline/00_setup_env_dryrun.log         |  10 ++
+ logs/headline/00_setup_env_real.log           |  15 ++
+ logs/headline/01_download_dryrun.log          |  44 +++++
+ logs/headline/02_check_data_priority1.log     |  29 ++++
+ logs/headline/02_check_data_priority2.log     |  62 +++++++
+ logs/headline/03_irds_access.log              |  47 +++++
+ logs/headline/04_collect_results.log          |   1 +
+ logs/headline/cpu_venv_install.log            |   0
+ logs/headline/hf_reachability.log             |  11 ++
+ ..._monot53b_distillation_l1_0.0_0.00001.yaml | 103 +++++++++++
+ ...distillation_l1_0.0_0.00001_entw_0.05.yaml | 129 ++++++++++++++
+ ...distillation_l1_0.0_0.00001_entw_0.05.yaml | 129 ++++++++++++++
+ ...distillation_l1_0.0_0.00001_entw_0.05.yaml | 129 ++++++++++++++
+ ..._monot53b_distillation_l1_0.0_0.00001.yaml | 103 +++++++++++
+ ..._monot53b_distillation_l1_0.0_0.00001.yaml | 103 +++++++++++
+ logs/headline/resolved_settings.md            |   8 +
+ .../run_priority_dryrun_priority1.log         |  12 ++
+ .../run_priority_dryrun_priority2.log         |  16 ++
+ logs/headline/verify.log                      |  47 +++++
+ logs/headline/verify_after_fixes.log          |  47 +++++
+ requirements-lock.txt                         |  10 +-
+ results/results.csv                           |  47 +++++
+ scripts/big_pc/02_check_data.py               |  20 ++-
+ 28 files changed, 1298 insertions(+), 20 deletions(-)
+ create mode 100644 HEADLINE_REPRODUCTION_REPORT.md
+ create mode 100644 logs/headline/00_setup_env_dryrun.log
+ create mode 100644 logs/headline/00_setup_env_real.log
+ create mode 100644 logs/headline/01_download_dryrun.log
+ create mode 100644 logs/headline/02_check_data_priority1.log
+ create mode 100644 logs/headline/02_check_data_priority2.log
+ create mode 100644 logs/headline/03_irds_access.log
+ create mode 100644 logs/headline/04_collect_results.log
+ create mode 100644 logs/headline/cpu_venv_install.log
+ create mode 100644 logs/headline/hf_reachability.log
+ create mode 100644 logs/headline/resolved_configs/qmlp_dmlm_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml
+ create mode 100644 logs/headline/resolved_configs/qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.yaml
+ create mode 100644 logs/headline/resolved_configs/qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.yaml
+ create mode 100644 logs/headline/resolved_configs/qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.yaml
+ create mode 100644 logs/headline/resolved_configs/qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml
+ create mode 100644 logs/headline/resolved_configs/qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml
+ create mode 100644 logs/headline/resolved_settings.md
+ create mode 100644 logs/headline/run_priority_dryrun_priority1.log
+ create mode 100644 logs/headline/run_priority_dryrun_priority2.log
+ create mode 100644 logs/headline/verify.log
+ create mode 100644 logs/headline/verify_after_fixes.log
+ create mode 100644 results/results.csv
+
+diff --git a/DyVo/lsr/configs/experiment/qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml b/DyVo/lsr/configs/experiment/qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml
+index a94269d..5a223b3 100644
+--- a/DyVo/lsr/configs/experiment/qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml
++++ b/DyVo/lsr/configs/experiment/qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml
+@@ -6,8 +6,8 @@ defaults:
+   - override /loss: sparse_kl_loss 
+   - override /model: qmlp_dmlm  
+ model:
+-  query_encoder_checkpoint: dyvo_data/dyvo_init/query_encoder/pytorch_model.bin 
+-  doc_encoder_checkpoint: dyvo_data/dyvo_init/doc_encoder/pytorch_model.bin 
++  query_encoder_checkpoint: dyvo_data/dyvo_init/query_encoder/model.safetensors  # DYVO-REPRO (headline): the release ships only model.safetensors (logs/hf_listing.tsv) 
++  doc_encoder_checkpoint: dyvo_data/dyvo_init/doc_encoder/model.safetensors  # DYVO-REPRO (headline): the release ships only model.safetensors (logs/hf_listing.tsv) 
+   
+ query_max_length: 50
+ doc_max_length: 512
+diff --git a/DyVo/lsr/configs/experiment/qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml b/DyVo/lsr/configs/experiment/qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml
+index 8e52828..e9e6940 100644
+--- a/DyVo/lsr/configs/experiment/qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml
++++ b/DyVo/lsr/configs/experiment/qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml
+@@ -6,8 +6,8 @@ defaults:
+   - override /loss: sparse_kl_loss 
+   - override /model: qmlp_dmlm  
+ model:
+-  query_encoder_checkpoint: dyvo_data/dyvo_init/query_encoder/pytorch_model.bin 
+-  doc_encoder_checkpoint: dyvo_data/dyvo_init/doc_encoder/pytorch_model.bin 
++  query_encoder_checkpoint: dyvo_data/dyvo_init/query_encoder/model.safetensors  # DYVO-REPRO (headline): the release ships only model.safetensors (logs/hf_listing.tsv) 
++  doc_encoder_checkpoint: dyvo_data/dyvo_init/doc_encoder/model.safetensors  # DYVO-REPRO (headline): the release ships only model.safetensors (logs/hf_listing.tsv) 
+   
+ query_max_length: 50
+ doc_max_length: 512
+diff --git a/HEADLINE_REPRODUCTION_REPORT.md b/HEADLINE_REPRODUCTION_REPORT.md
+new file mode 100644
+index 0000000..5851356
+--- /dev/null
++++ b/HEADLINE_REPRODUCTION_REPORT.md
+@@ -0,0 +1,161 @@
++# DyVo headline reproduction: LSR-w vs DyVo (REL + LaQue), L1 = 1e-5
++
++**Status: BLOCKED. None of the six headline runs could be trained on this machine.**
++This report records exactly what was done, what is ready, what is missing, and the evidence for each
++blocker. Every claim below points to a log in `logs/headline/`. No number in this report is a reproduced
++retrieval result: the "ours" columns are empty on purpose.
++
++Scope followed: prompt `PROMPT - DyVo Headline Reproduction Stage` (priority1 + priority2 only; no extensions,
++no LLM calls, no Table 2/3, no L1 sweep). The separate SQuAD re-implementation (`infinity2147/cs6101_midsem`) is
++**not** used as a substitute for the paper's datasets (prompt §20.10).
++
++---
++
++## 1. Exact environment
++
++| Item | Value | Evidence |
++|---|---|---|
++| Repository | `Parav29/DyVo-CS6101` @ `158b65b` (`master`), clean working tree before this stage | `git rev-parse HEAD` |
++| OS | Ubuntu 24.04.4 LTS, Linux 6.18 x86-64 (cloud container) | `uname`, `/etc/os-release` |
++| **GPU** | **none**: no `nvidia-smi`, no CUDA driver or toolkit | Step 0 inventory |
++| CPU | 4 × Intel Xeon @ 2.1 GHz | `lscpu` |
++| **RAM** | **16.9 GB** (15.7 GiB) | `free` |
++| **Free disk** | **~9–12 GB** (252 GB volume, shared) | `df -h /` |
++| Python | 3.10.20 (`.venv`, same minor version as the build machine) | `.venv/bin/python --version` |
++| Packages | torch 2.2.2 (+cu121 wheel from PyPI, running on CPU), transformers 4.40.2, hydra 1.3.2, ir-datasets 0.6.3, ir-measures 0.4.3, wandb 0.16.6: the lock-file pins | `logs/headline/cpu_venv_install.log` |
++| CUDA | not available (`torch.cuda.is_available() == False`) | |
++| Network | Egress policy blocks `huggingface.co`, `*.hf.co`, `hf-mirror.com`, `download.pytorch.org`, `trec.nist.gov`, `mirror.ir-datasets.com`. PyPI and `raw.githubusercontent.com` are reachable | `logs/headline/hf_reachability.log`, `03_irds_access.log`, `00_setup_env_real.log` |
++
++### Dataset / asset availability
++
++| Resource | Needed by | Status | Evidence |
++|---|---|---|---|
++| `lsr42/dyvo_data`: `dyvo_init/*/model.safetensors` (MS MARCO LSR init) | all 6 runs | **missing**: HF hub blocked (403) | `hf_reachability.log` |
++| `dyvo_data/knowledge_base/entity_embs_laque.pt` (16.2 GB) | 3 DyVo runs | **missing**: HF blocked; would not fit (16.2 GB > free disk; ≈ total RAM) | `01_download_dryrun.log` |
++| MonoT5-3B scores, InPars-v2 / Mixtral training topics and qrels (`*_monot5_3b_scores.json`, `*_topics.tsv`, `*_qrels.json`) | all 6 runs | **missing**: HF blocked | `02_check_data_priority{1,2}.log` |
++| REL query candidates `*/queries_test_train_entities_rel.jsonl` | DyVo runs | **present** (downloaded on the build machine, in git) | `02_check_data_priority1.log` |
++| REL document candidates `*/docs_entities.jsonl` (123 / 431 / 516 MB) | DyVo runs | **missing**: HF blocked | same |
++| CODEC queries + qrels (`ir_datasets` `codec`) | priority1 | **available** (GitHub) | `03_irds_access.log` |
++| CODEC documents (`comets_documents.jsonl`, 729k docs) | priority1 | **missing**: distributed on request by the CODEC authors | `03_irds_access.log` |
++| Robust04 topics, qrels, TREC Disks 4 & 5 | priority2 | **missing**: NIST blocked; corpus is licensed | `03_irds_access.log` |
++| Core 2018 topics, qrels, Washington Post v2 | priority2 | **missing**: NIST blocked; corpus is licensed | `03_irds_access.log` |
++
++---
++
++## 2. Exact experiment configuration (verified, not assumed)
++
++The six runs were composed with the real entry point and the wrapper's overrides
++(`python -m lsr.train +experiment=<name> training_arguments.fp16=True training_arguments.per_device_train_batch_size=16 --cfg job`).
++The fully resolved configs are saved in `logs/headline/resolved_configs/`; the table is extracted from them
++(`logs/headline/resolved_settings.md`).
++
++| Run | Batch | LR | Steps | Warm-up | fp16 | q / d len | Seed | L1 doc / query | `reg_ent` | Loss norm | λ_ent q / d | Entity table | Query / doc candidates | Init | Training data |
++|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
++| LSR-w CODEC | 16 | 5e-7 | 100k | 0.1 | ✓ | 50 / 512 | 42 | 1e-5 / 0 | – | std | – | – | – | dyvo_init safetensors | `codec_mistral_topics.tsv` + `codec_monot5_3b_scores.json` |
++| DyVo CODEC | 16 | 5e-7 | 100k | 0.1 | ✓ | 50 / 512 | 42 | 1e-5 / 0 | False | std | 0.05 / 0.05 | `entity_embs_laque.pt` (768-d) | REL / `docs_entities.jsonl` | same | same |
++| LSR-w Robust04 | 16 | 5e-7 | 100k | 0.1 | ✓ | 50 / 512 | 42 | 1e-5 / 0 | – | std | – | – | – | same (see fix F3) | `robust04_inparsv2_topics.tsv` + `robust04_monot5_3b_scores.json` |
++| DyVo Robust04 | 16 | 5e-7 | 100k | 0.1 | ✓ | 50 / 512 | 42 | 1e-5 / 0 | False | std | 0.05 / 0.05 | LaQue | REL / `docs_entities.jsonl` | same | same |
++| LSR-w Core18 | 16 | 5e-7 | 100k | 0.1 | ✓ | 50 / 512 | 42 | 1e-5 / 0 | – | std | – | – | – | same (see fix F3) | `wapo_inparsev2_topics.tsv` + `wapo_monot5_3b_scores.json` |
++| DyVo Core18 | 16 | 5e-7 | 100k | 0.1 | ✓ | 50 / 512 | 42 | 1e-5 / 0 | False | std | 0.05 / 0.05 | LaQue | REL / `docs_entities.jsonl` | same | same |
++
++All runs use backbone `distilbert-base-uncased`, an MLP query encoder, an MLM (SPLADE) document encoder, frozen
++entity embeddings, and the released MonoT5-3B teacher. The test set is the **full collection** for all six
++(`test_dataset.num_documents = -1`), with the paper's query fields (`query` for CODEC, `description` for
++Robust04/Core18). The in-training eval (`num_documents = 100000`, qrels documents only) is used only for
++monitoring and must not be reported. Metrics: nDCG@10, nDCG@20, R@1000. This matches the prompt's paper-faithful
++list (§7) item by item.
++
++Release behaviours kept on purpose (NOTES.md; prompt §8): λ_ent inside the ReLU; no attention mask in the entity
++max-pool; the DyVo collator truncates queries at `d_max_length`; `normalize: "std"` = L2-normalized teacher scores.
++
++---
++
++## 3. Paper vs reproduced results
++
++`results/results.csv` (from `scripts/big_pc/04_collect_results.py`): **0 / 46 experiments finished; all six
++headline rows are `not run`.**
++
++| Dataset | Model | Paper nDCG@10 | Ours | Δ | Paper nDCG@20 | Ours | Δ | Paper R@1000 | Ours | Δ |
++|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
++| CODEC | LSR-w | 52.61 | not run | – | 49.22 | not run | – | 69.07 | not run | – |
++| CODEC | DyVo (REL) | 53.40 | not run | – | 51.15 | not run | – | 70.60 | not run | – |
++| Robust04 | LSR-w | 49.13 | not run | – | 46.34 | not run | – | 66.86 | not run | – |
++| Robust04 | DyVo (REL) | 51.19 | not run | – | 47.65 | not run | – | 68.56 | not run | – |
++| Core18 | LSR-w | 40.99 | not run | – | 38.73 | not run | – | 63.22 | not run | – |
++| Core18 | DyVo (REL) | 43.72 | not run | – | 40.56 | not run | – | 63.56 | not run | – |
++
++(Paper numbers are read from `scripts/big_pc/experiments.py::PAPER`, not re-typed.)
++
++## 4. Main-effect comparison (DyVo − LSR-w)
++
++| Dataset | Paper Δ nDCG@10 | Paper Δ nDCG@20 | Paper Δ R@1000 | Our Δ | Interpretation |
++|---|---:|---:|---:|---|---|
++| CODEC | +0.79 | +1.93 | +1.53 | not run | blocked by unavailable data (and no GPU) |
++| Robust04 | +2.06 | +1.31 | +1.70 | not run | blocked by unavailable data (and no GPU) |
++| Core18 | +2.73 | +1.83 | +0.34 | not run | blocked by unavailable data (and no GPU) |
++
++Note for whoever runs it: the paper's CODEC nDCG@10 gain (+0.79) is small. With only 42 CODEC test queries, a
++single-seed run could land on either side of it. Report the per-query paired difference (and ideally a second seed)
++before calling the CODEC direction reproduced or not.
++
++## 5. Discrepancy analysis
++
++There are no reproduced numbers to compare, so there is nothing to diagnose on the retrieval side. The
++discrepancies found are **pipeline defects that would have broken or silently corrupted the runs**. All were fixed
++minimally and marked `DYVO-REPRO`:
++
++| # | Found | Paper description | Released code / repo behaviour | Fix (this stage) | Evidence |
++|---|---|---|---|---|---|
++| F1 | `requirements-lock.txt` cannot be installed on Linux: `googleapis-common-protos==1.75.3` requires `protobuf>=6.33.5` and `opentelemetry-*==1.44.0` require `protobuf>=5`, but the lock pins `protobuf==4.25.9` (needed by `wandb 0.16.6`). **`00_setup_env.sh` would fail the same way on the GPU machine.** | – | inconsistent `pip freeze` from the build machine | removed the 7 unused pins (commented in the lock). The remaining 80 pins install and `pip check` reports *No broken requirements*, so nothing in the project needs them | `logs/headline/cpu_venv_install.log` |
++| F2 | `02_check_data.py` reported `ok ir_datasets:codec has local data` and `ok …wapo…` when only topics/qrels were present: it tested "folder not empty". A missing corpus was also only a WARN | – | – | the check now reads one real document and raises an **ERROR** if it can't. CODEC and Core18 now correctly FAIL here | `logs/headline/02_check_data_priority{1,2}.log` |
++| F3 | LSR-w Robust04 and Core18 (L1 1e-5) configs load `dyvo_init/*/pytorch_model.bin`, but the release contains **only** `model.safetensors` (full repo listing `logs/hf_listing.tsv`). These two headline runs would crash at start | paper: every model starts from the same MS MARCO LSR | CODEC LSR-w and all DyVo configs already use `model.safetensors` | the two headline configs now point to `model.safetensors`. `DualSparseEncoder` loads either format, and `tests/test_checkpoint_load.py` already shows the LSR-w encoders load these files. The 4 priority3 LSR-w configs (L1 1e-3/1e-4, Robust04/Core18) have the same issue and were left for that stage | `logs/headline/02_check_data_priority2.log` (the `.bin` FAILs are gone) |
++
++After the fixes, `bash scripts/verify.sh` stays green on Linux: 73/73 configs compose, 61 tests pass, the
++overfit check passes, and both smoke runs complete (`logs/headline/verify_after_fixes.log`).
++
++## 6. Reproduction verdict
++
++**Blocked by unavailable data and hardware: not reproduced, not refuted.** Nothing was trained, so this stage
++makes no claim about whether DyVo improves over LSR-w.
++
++The blockers, all external to the code:
++1. **Released assets** (`lsr42/dyvo_data`: init checkpoints, LaQue table, teacher scores, training topics,
++   document entities) can't be downloaded: HF is blocked by this environment's network policy.
++2. **Corpora**: CODEC documents are on request; Robust04 (TREC Disks 4 & 5) and Washington Post v2 are licensed
++   NIST data, and NIST itself is unreachable from here.
++3. **Hardware**: no GPU. RAM (16.9 GB) is about equal to the LaQue table alone (16.2 GB), before the model,
++   optimizer and corpus text. Free disk (~9–12 GB) is below the 18.1 GB asset download. The handoff estimates
++   ~8–15 A100-hours per run. Reducing batch size, document length, steps, corpus size or model to fit would be a
++   different experiment (prompt §9, §20.4), so it was not done.
++
++## 7. What is ready, and the exact path to finish
++
++Ready and verified: the code (`verify.sh` green on Linux), the six resolved configs, the corrected lock file, the
++data checker (which now catches missing corpora), the priority runner, the results collector, and the REL query
++candidates.
++
++On a machine with an A100-class GPU (≥ 24 GB), ≥ 32 GB RAM (64 GB recommended), ≥ 30 GB free disk, HF access, the
++CODEC documents and the licensed NIST corpora:
++```bash
++bash scripts/big_pc/00_setup_env.sh && source .venv-gpu/bin/activate     # works now that F1 is fixed
++bash scripts/verify.sh
++python scripts/big_pc/01_list_and_download_data.py --datasets codec,robust04,wapo --embeddings laque
++# place comets_documents.jsonl under ~/.ir_datasets/codec/v1/ (and Disks 4&5 / WaPo v2 for priority2)
++python scripts/big_pc/02_check_data.py --experiments priority1                   # must end with 0 errors
++bash scripts/big_pc/run_priority.sh --groups priority1
++python scripts/big_pc/04_collect_results.py --recompute
++python scripts/big_pc/02_check_data.py --experiments priority2 && bash scripts/big_pc/run_priority.sh --groups priority2
++python scripts/big_pc/04_collect_results.py --recompute
++```
++Then fill sections 3–6 of this report from `results/results.csv`, checking each log against the list in prompt §12
++(init loaded without unexpected missing keys, no NaN, `query/doc #entities` > 0, batch 16, lr 5e-7, 100k steps,
++d_len 512, correct candidate and LaQue paths, full-corpus test).
++
++## 8. Files produced in this stage
++- `HEADLINE_REPRODUCTION_REPORT.md` (this file)
++- `results/results.csv`: collector output, all headline rows `not run`
++- `logs/headline/`: environment setup (dry-run and real), CPU venv install, verify runs (before and after fixes),
++  download dry-run, HF reachability, `ir_datasets` access test, data checks for priority1/2, priority dry-runs,
++  collector log, `resolved_configs/*.yaml` and `resolved_settings.md`
++- Code and config changes (all marked `DYVO-REPRO`): `requirements-lock.txt` (F1), `scripts/big_pc/02_check_data.py` (F2),
++  two LSR-w headline configs (F3)
+diff --git a/NOTES.md b/NOTES.md
+index d2ced68..119cc9b 100644
+--- a/NOTES.md
++++ b/NOTES.md
+@@ -141,3 +141,18 @@ No. The paper's LLM outputs (Mixtral CODEC training queries; GPT-4 / Mixtral / B
+ - S2.1: `python smoke_assets/build_assets.py` → `vocab_size == 30522`, `built smoke assets in 1.7s, total 13.5 MB`.
+ - S2.2: `bash scripts/check_configs.sh` → initially 32/43 (11 missing `trec_robust04_fold1`); after adding it → `configs composed: 43 passed, 0 failed`.
+ - S0/S1: `python -c "import lsr.models, lsr.losses, lsr.datasets, lsr.trainer"` → ok after fix #1.
++
++## Headline reproduction stage (priority1 + priority2), see `HEADLINE_REPRODUCTION_REPORT.md`
++Run on a Linux cloud container (Ubuntu 24.04, 4 CPU, 16.9 GB RAM, **no GPU**, HF hub and NIST blocked by network
++policy). Outcome: **BLOCKED**, no headline run could be trained (missing `lsr42/dyvo_data` assets, CODEC documents
++and licensed corpora; no GPU; RAM ≈ LaQue table size). Logs: `logs/headline/`.
++Edits made (all `# DYVO-REPRO`, minimal):
++- F1 `requirements-lock.txt`: removed 7 unused pins (`googleapis-common-protos==1.75.3`, `opentelemetry-*==1.44.0`)
++  that conflict with `protobuf==4.25.9` (needed by wandb 0.16.6), so the lock was not installable on Linux and
++  `00_setup_env.sh` would have failed. After removal, `pip check` is clean → nothing depended on them.
++- F2 `scripts/big_pc/02_check_data.py::check_irds`: "folder not empty" gave false `ok` for CODEC/WaPo when only
++  topics/qrels were cached. It now reads one document and reports an ERROR (not WARN) if the corpus is unusable.
++- F3 LSR-w Robust04 / Core18 L1=1e-5 configs: init `pytorch_model.bin` → `model.safetensors` (the release ships only
++  safetensors, `logs/hf_listing.tsv`; same MS MARCO checkpoint as every other headline run; loader accepts both).
++  The same issue remains in the 4 priority3 LSR-w configs (L1 1e-3/1e-4, Robust04/Core18): fix when that stage runs.
++`bash scripts/verify.sh` → `VERIFY PASSED` on Linux before and after these edits.
+diff --git a/PROGRESS.md b/PROGRESS.md
+index 358c7e0..5ef08de 100644
+--- a/PROGRESS.md
++++ b/PROGRESS.md
+@@ -47,3 +47,15 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!] BLOCKED-EXTERNAL`
+ - [x] S7.1 SANITY_REPORT.md
+ - [x] S7.2 BIG_PC_HANDOFF.md
+ - [x] S7.3 Final verify.sh green
++
++## Phase H: headline reproduction (priority1 + priority2), `HEADLINE_REPRODUCTION_REPORT.md`
++- [x] H0 Inventory: no GPU, 16.9 GB RAM, ~9–12 GB free disk, HF/NIST blocked (Linux cloud container)
++- [!] BLOCKED-EXTERNAL H1 `00_setup_env.sh`: download.pytorch.org blocked, no CUDA. CPU `.venv` from the lock instead; lock fixed (F1)
++- [x] H1b `verify.sh` green on Linux (before and after edits)
++- [!] BLOCKED-EXTERNAL H2 `01_list_and_download_data.py`: HF hub 403; 18.1 GB > free disk
++- [!] BLOCKED-EXTERNAL H3 corpora: CODEC docs on request; Robust04 / WaPo licensed + NIST blocked (CODEC topics/qrels OK)
++- [x] H4 `02_check_data.py` priority1 (13 errors) / priority2 (27 errors), all missing external assets; checker fixed (F2)
++- [x] H4b resolved configs for the 6 runs saved and checked against the paper settings; LSR-w init path fixed (F3)
++- [x] H5 `run_priority.sh --dry-run` priority1 / priority2
++- [!] BLOCKED-EXTERNAL H6 training priority1 / priority2 (not started)
++- [x] H7 `04_collect_results.py` → `results/results.csv` (0/46 finished), report written with verdict "blocked"
+diff --git a/logs/headline/00_setup_env_dryrun.log b/logs/headline/00_setup_env_dryrun.log
+new file mode 100644
+index 0000000..992028d
+--- /dev/null
++++ b/logs/headline/00_setup_env_dryrun.log
+@@ -0,0 +1,10 @@
++[dry-run] python3.10 -m venv /home/user/DyVo-CS6101/.venv-gpu
++[dry-run] /home/user/DyVo-CS6101/.venv-gpu/bin/python -m pip install --upgrade pip
++[dry-run] /home/user/DyVo-CS6101/.venv-gpu/bin/python -m pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cu121
++[dry-run] grep -vE '^(torch|torchvision)==' /home/user/DyVo-CS6101/requirements-lock.txt > /home/user/DyVo-CS6101/logs/requirements-gpu.txt
++[dry-run] /home/user/DyVo-CS6101/.venv-gpu/bin/python -m pip install -r /home/user/DyVo-CS6101/logs/requirements-gpu.txt
++[dry-run] /home/user/DyVo-CS6101/.venv-gpu/bin/python -m pip install huggingface_hub[cli] psutil
++[dry-run] /home/user/DyVo-CS6101/.venv-gpu/bin/python -c import torch, transformers; print("torch", torch.__version__, "transformers", transformers.__version__); \
++assert torch.cuda.is_available(), "CUDA not available: check the driver / --cuda flag"; \
++print("GPU:", torch.cuda.get_device_name(0), round(torch.cuda.get_device_properties(0).total_memory/2**30, 1), "GiB")
++[00_setup_env 11:39:14] done. Activate with: source /home/user/DyVo-CS6101/.venv-gpu/bin/activate
+diff --git a/logs/headline/00_setup_env_real.log b/logs/headline/00_setup_env_real.log
+new file mode 100644
+index 0000000..3809880
+--- /dev/null
++++ b/logs/headline/00_setup_env_real.log
+@@ -0,0 +1,15 @@
++Installing collected packages: pip
++  Attempting uninstall: pip
++    Found existing installation: pip 23.0.1
++    Uninstalling pip-23.0.1:
++      Successfully uninstalled pip-23.0.1
++Successfully installed pip-26.2.1
++[00_setup_env 11:39:24] + /home/user/DyVo-CS6101/.venv-gpu/bin/python -m pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cu121
++Looking in indexes: https://download.pytorch.org/whl/cu121
++WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'OSError('Tunnel connection failed: 403 Forbidden')': /whl/cu121/torch/
++WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'OSError('Tunnel connection failed: 403 Forbidden')': /whl/cu121/torch/
++WARNING: Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'OSError('Tunnel connection failed: 403 Forbidden')': /whl/cu121/torch/
++WARNING: Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'OSError('Tunnel connection failed: 403 Forbidden')': /whl/cu121/torch/
++WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'OSError('Tunnel connection failed: 403 Forbidden')': /whl/cu121/torch/
++ERROR: Could not find a version that satisfies the requirement torch==2.2.2 (from versions: none)
++ERROR: No matching distribution found for torch==2.2.2
+diff --git a/logs/headline/01_download_dryrun.log b/logs/headline/01_download_dryrun.log
+new file mode 100644
+index 0000000..b935a64
+--- /dev/null
++++ b/logs/headline/01_download_dryrun.log
+@@ -0,0 +1,44 @@
++repo total 94.69 GB; selected 41 files = 18.10 GB; to download 25 files = 18.10 GB
++  TODO     0.001 GB  codec/codec_mistral_qrels.json
++  TODO     0.001 GB  codec/codec_mistral_topics.tsv
++  TODO     0.052 GB  codec/codec_monot5_3b_scores.json
++  TODO     0.123 GB  codec/docs_entities.jsonl
++  have     0.000 GB  codec/queries_entities_bm25.jsonl
++  have     0.000 GB  codec/queries_entities_gpt4.jsonl
++  have     0.000 GB  codec/queries_entities_laque.jsonl
++  have     0.000 GB  codec/queries_entities_mistral.jsonl
++  have     0.000 GB  codec/queries_test_train_entities_human.jsonl
++  have     0.000 GB  codec/queries_test_train_entities_rel.jsonl
++  TODO     0.000 GB  dyvo_init/config.json
++  TODO     0.000 GB  dyvo_init/doc_encoder/config.json
++  TODO     0.268 GB  dyvo_init/doc_encoder/model.safetensors
++  TODO     0.000 GB  dyvo_init/loss.pt
++  TODO     0.000 GB  dyvo_init/query_encoder/config.json
++  TODO     0.265 GB  dyvo_init/query_encoder/model.safetensors
++  TODO     0.000 GB  dyvo_init/tokenizer/class_config.json
++  TODO     0.000 GB  dyvo_init/tokenizer/special_tokens_map.json
++  TODO     0.001 GB  dyvo_init/tokenizer/tokenizer.json
++  TODO     0.000 GB  dyvo_init/tokenizer/tokenizer_config.json
++  TODO     0.000 GB  dyvo_init/tokenizer/vocab.txt
++  TODO    16.213 GB  knowledge_base/entity_embs_laque.pt
++  TODO     0.129 GB  knowledge_base/entity_list.json
++  TODO     0.431 GB  robust04/docs_entities.jsonl
++  have     0.000 GB  robust04/queries_entities_bm25.jsonl
++  have     0.000 GB  robust04/queries_entities_gpt4.jsonl
++  have     0.000 GB  robust04/queries_entities_laque.jsonl
++  have     0.000 GB  robust04/queries_entities_mistral.jsonl
++  have     0.001 GB  robust04/queries_test_train_entities_rel.jsonl
++  TODO     0.000 GB  robust04/robust04_inparsv2_qrels.json
++  TODO     0.001 GB  robust04/robust04_inparsv2_topics.tsv
++  TODO     0.037 GB  robust04/robust04_monot5_3b_scores.json
++  TODO     0.516 GB  wapo/docs_entities.jsonl
++  have     0.000 GB  wapo/queries_entities_bm25.jsonl
++  have     0.000 GB  wapo/queries_entities_gpt4.jsonl
++  have     0.000 GB  wapo/queries_entities_laque.jsonl
++  have     0.000 GB  wapo/queries_entities_mistral.jsonl
++  have     0.001 GB  wapo/queries_test_train_entities_rel.jsonl
++  TODO     0.001 GB  wapo/wapo_inparsev2_qrels.json
++  TODO     0.001 GB  wapo/wapo_inparsev2_topics.tsv
++  TODO     0.060 GB  wapo/wapo_monot5_3b_scores.json
++free disk: 12.3 GB (need 18.1 GB + 10.0 GB margin)
++NOT ENOUGH DISK: drop embeddings (--embeddings laque) or free space
+diff --git a/logs/headline/02_check_data_priority1.log b/logs/headline/02_check_data_priority1.log
+new file mode 100644
+index 0000000..db21472
+--- /dev/null
++++ b/logs/headline/02_check_data_priority1.log
+@@ -0,0 +1,29 @@
++
++== qmlp_dmlm_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001
++  FAIL  MISSING: dyvo_data/codec/codec_mistral_topics.tsv
++  FAIL  MISSING: dyvo_data/codec/codec_mistral_qrels.json
++  FAIL  MISSING: dyvo_data/codec/codec_monot5_3b_scores.json
++  FAIL  MISSING: dyvo_data/dyvo_init/query_encoder/model.safetensors
++  FAIL  MISSING: dyvo_data/dyvo_init/doc_encoder/model.safetensors
++[INFO] The CODEC document collection is available on request (see here: <https://github.com/grill-lab/CODEC>). Once downloaded, move/link the comets_documents.jsonl file to /root/.ir_datasets/codec/v1/comets_documents.jsonl.
++  FAIL  ir_datasets:codec: documents NOT readable (FileNotFoundError: /root/.ir_datasets/codec/v1/comets_documents.jsonl). CODEC documents: follow https://ir-datasets.com/codec.html (the corpus is obtained from the CODEC authors)
++
++== qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05
++  FAIL  MISSING: dyvo_data/codec/codec_mistral_topics.tsv
++  FAIL  MISSING: dyvo_data/codec/codec_mistral_qrels.json
++  FAIL  MISSING: dyvo_data/codec/codec_monot5_3b_scores.json
++  FAIL  MISSING: dyvo_data/dyvo_init/query_encoder/model.safetensors
++  FAIL  MISSING: dyvo_data/dyvo_init/doc_encoder/model.safetensors
++  FAIL  MISSING: dyvo_data/knowledge_base/entity_embs_laque.pt
++  ok    exists: dyvo_data/codec/queries_test_train_entities_rel.jsonl
++  FAIL  MISSING: dyvo_data/codec/docs_entities.jsonl
++  ok    query_encoder.entity_dim=768 (table laque is 768-d)
++  ok    doc_encoder.entity_dim=768 (table laque is 768-d)
++  WARN  entity table laque: 16.2 GB loaded fully into CPU RAM; machine RAM 17 GB -> too tight. Option: in lsr/models/entity_emb.py use torch.load(..., mmap=True) (needs a file saved with torch>=2.1 zip format), or add RAM/swap.
++
++== global data checks
++  WARN  /home/user/DyVo-CS6101/DyVo/dyvo_data/knowledge_base/entity_list.json missing (needed for --backend remap and name spot checks)
++  WARN  robust04/queries_entities_gpt4.jsonl: 0 ids shared with REL and every row has duplicates -> likely a different id space (NOTES S5.0 #5). run_priority.sh re-maps it from entity_names.
++  note  /home/user/DyVo-CS6101/DyVo/dyvo_data/robust04/docs.tsv is not in lsr42/dyvo_data and NOT needed by the experiment configs (they read irds:disks45/nocr/trec-robust-2004). Only if you switch robust04_inparsv2_monot53b.yaml to the local TSV: build it from the licensed corpus with lsr/preprocess/export_robust04_docs.py (format: doc_id<TAB>title + ' ' + body, one line per doc, no tabs/newlines inside).
++
++SUMMARY: 13 errors, 3 warnings
+diff --git a/logs/headline/02_check_data_priority2.log b/logs/headline/02_check_data_priority2.log
+new file mode 100644
+index 0000000..615ebce
+--- /dev/null
++++ b/logs/headline/02_check_data_priority2.log
+@@ -0,0 +1,62 @@
++
++== qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001
++  FAIL  MISSING: dyvo_data/robust04/robust04_inparsv2_topics.tsv
++  FAIL  MISSING: dyvo_data/robust04/robust04_inparsv2_qrels.json
++  FAIL  MISSING: dyvo_data/robust04/robust04_monot5_3b_scores.json
++  FAIL  MISSING: dyvo_data/dyvo_init/query_encoder/model.safetensors
++  FAIL  MISSING: dyvo_data/dyvo_init/doc_encoder/model.safetensors
++[INFO] Please confirm you agree to the TREC data usage agreement found at <https://trec.nist.gov/data/cd45/index.html>
++[INFO] The TREC Robust document collection is from TREC disks 4 and 5. Due to the copyrighted nature of the  documents, this collection is for research use only, which requires agreements to be filed with NIST. See details here: <https://trec.nist.gov/data/cd45/index.html>.
++More details about the procedure can be found here: <https://ir-datasets.com/trec-robust04.html#DataAccess>.
++Once completed, place the uncompressed source here: /root/.ir_datasets/disks45/corpus
++This should contain directories like NEWS_data/FBIS, NEWS_data/FR94, etc.
++  FAIL  ir_datasets:disks45/nocr/trec-robust-2004: documents NOT readable (FileNotFoundError: /root/.ir_datasets/disks45/corpus). TREC Disks 4&5 (minus CR): obtain from NIST (https://trec.nist.gov/data/cd45/), then follow https://ir-datasets.com/disks45.html to place the files under ~/.ir_datasets/disks45/corpus
++[INFO] The TREC Robust document collection is from TREC disks 4 and 5. Due to the copyrighted nature of the  documents, this collection is for research use only, which requires agreements to be filed with NIST. See details here: <https://trec.nist.gov/data/cd45/index.html>.
++More details about the procedure can be found here: <https://ir-datasets.com/trec-robust04.html#DataAccess>.
++Once completed, place the uncompressed source here: /root/.ir_datasets/disks45/corpus
++This should contain directories like NEWS_data/FBIS, NEWS_data/FR94, etc.
++  FAIL  ir_datasets:disks45/nocr/trec-robust-2004/fold1: documents NOT readable (FileNotFoundError: /root/.ir_datasets/disks45/corpus). TREC Disks 4&5 (minus CR): obtain from NIST (https://trec.nist.gov/data/cd45/), then follow https://ir-datasets.com/disks45.html to place the files under ~/.ir_datasets/disks45/corpus
++
++== qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05
++  FAIL  MISSING: dyvo_data/robust04/robust04_inparsv2_topics.tsv
++  FAIL  MISSING: dyvo_data/robust04/robust04_inparsv2_qrels.json
++  FAIL  MISSING: dyvo_data/robust04/robust04_monot5_3b_scores.json
++  FAIL  MISSING: dyvo_data/dyvo_init/query_encoder/model.safetensors
++  FAIL  MISSING: dyvo_data/dyvo_init/doc_encoder/model.safetensors
++  FAIL  MISSING: dyvo_data/knowledge_base/entity_embs_laque.pt
++  ok    exists: dyvo_data/robust04/queries_test_train_entities_rel.jsonl
++  FAIL  MISSING: dyvo_data/robust04/docs_entities.jsonl
++  ok    query_encoder.entity_dim=768 (table laque is 768-d)
++  ok    doc_encoder.entity_dim=768 (table laque is 768-d)
++  WARN  entity table laque: 16.2 GB loaded fully into CPU RAM; machine RAM 17 GB -> too tight. Option: in lsr/models/entity_emb.py use torch.load(..., mmap=True) (needs a file saved with torch>=2.1 zip format), or add RAM/swap.
++
++== qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001
++  FAIL  MISSING: dyvo_data/wapo/wapo_inparsev2_topics.tsv
++  FAIL  MISSING: dyvo_data/wapo/wapo_inparsev2_qrels.json
++  FAIL  MISSING: dyvo_data/wapo/wapo_monot5_3b_scores.json
++  FAIL  MISSING: dyvo_data/dyvo_init/query_encoder/model.safetensors
++  FAIL  MISSING: dyvo_data/dyvo_init/doc_encoder/model.safetensors
++[INFO] The Washington Post collection can be requested here: <https://trec.nist.gov/data/wapost/>
++More details about the procedure can be found here: <https://ir-datasets.com/wapo.html#DataAccess>.
++Once completed, place/link the source file: /root/.ir_datasets/wapo/WashingtonPost.v2.tar.gz
++  FAIL  ir_datasets:wapo/v2/trec-core-2018: documents NOT readable (FileNotFoundError: /root/.ir_datasets/wapo/WashingtonPost.v2.tar.gz). Washington Post v2: request from NIST (https://trec.nist.gov/data/wapost/), then follow https://ir-datasets.com/wapo.html (~/.ir_datasets/wapo/WashingtonPost.v2.tar.gz)
++
++== qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05
++  FAIL  MISSING: dyvo_data/wapo/wapo_inparsev2_topics.tsv
++  FAIL  MISSING: dyvo_data/wapo/wapo_inparsev2_qrels.json
++  FAIL  MISSING: dyvo_data/wapo/wapo_monot5_3b_scores.json
++  FAIL  MISSING: dyvo_data/dyvo_init/query_encoder/model.safetensors
++  FAIL  MISSING: dyvo_data/dyvo_init/doc_encoder/model.safetensors
++  FAIL  MISSING: dyvo_data/knowledge_base/entity_embs_laque.pt
++  ok    exists: dyvo_data/wapo/queries_test_train_entities_rel.jsonl
++  FAIL  MISSING: dyvo_data/wapo/docs_entities.jsonl
++  ok    query_encoder.entity_dim=768 (table laque is 768-d)
++  ok    doc_encoder.entity_dim=768 (table laque is 768-d)
++  WARN  entity table laque: 16.2 GB loaded fully into CPU RAM; machine RAM 17 GB -> too tight. Option: in lsr/models/entity_emb.py use torch.load(..., mmap=True) (needs a file saved with torch>=2.1 zip format), or add RAM/swap.
++
++== global data checks
++  WARN  /home/user/DyVo-CS6101/DyVo/dyvo_data/knowledge_base/entity_list.json missing (needed for --backend remap and name spot checks)
++  WARN  robust04/queries_entities_gpt4.jsonl: 0 ids shared with REL and every row has duplicates -> likely a different id space (NOTES S5.0 #5). run_priority.sh re-maps it from entity_names.
++  note  /home/user/DyVo-CS6101/DyVo/dyvo_data/robust04/docs.tsv is not in lsr42/dyvo_data and NOT needed by the experiment configs (they read irds:disks45/nocr/trec-robust-2004). Only if you switch robust04_inparsv2_monot53b.yaml to the local TSV: build it from the licensed corpus with lsr/preprocess/export_robust04_docs.py (format: doc_id<TAB>title + ' ' + body, one line per doc, no tabs/newlines inside).
++
++SUMMARY: 27 errors, 4 warnings
+diff --git a/logs/headline/03_irds_access.log b/logs/headline/03_irds_access.log
+new file mode 100644
+index 0000000..f626f48
+--- /dev/null
++++ b/logs/headline/03_irds_access.log
+@@ -0,0 +1,47 @@
++[INFO] [starting] https://raw.githubusercontent.com/grill-lab/CODEC/main/topics/topics.json
++https://raw.githubusercontent.com/grill-lab/CODEC/main/topics/topics.json: 0.0%|                                                                                [INFO] [finished] https://raw.githubusercontent.com/grill-lab/CODEC/main/topics/topics.json: [00:0
++https://raw.githubusercontent.com/grill-lab/CODEC/main/topics/topics.json: [00:0                                                                                OK    codec                              queries first items readable (5)
++[INFO] [starting] https://raw.githubusercontent.com/grill-lab/CODEC/main/raw_judgments/raw_document_judgments.txt
++https://raw.githubusercontent.com/grill-lab/CODEC/main/raw_judgments/raw_documen                                                                                [INFO] [finished] https://raw.githubusercontent.com/grill-lab/CODEC/main/raw_judgments/raw_documen
++https://raw.githubusercontent.com/grill-lab/CODEC/main/raw_judgments/raw_documen                                                                                OK    codec                              qrels   first items readable (5)
++[INFO] The CODEC document collection is available on request (see here: <https://github.com/grill-lab/CODEC>). Once downloaded, move/link the comets_documents.jsonl file to /root/.ir_datasets/codec/v1/comets_documents.jsonl.
++FAIL  codec                              docs    FileNotFoundError: /root/.ir_datasets/codec/v1/comets_documents.jsonl
++[INFO] Please confirm you agree to the TREC data usage agreement found at <https://trec.nist.gov/data/cd45/index.html>
++[INFO] download error: HTTPSConnectionPool(host='trec.nist.gov', port=443): Max retries exceeded with url: /data/robust/04.testset.gz (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[INFO] download error: HTTPSConnectionPool(host='trec.nist.gov', port=443): Max retries exceeded with url: /data/robust/04.testset.gz (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[WARNING] Download failed: HTTPSConnectionPool(host='trec.nist.gov', port=443): Max retries exceeded with url: /data/robust/04.testset.gz (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
++[INFO] download error: HTTPSConnectionPool(host='mirror.ir-datasets.com', port=443): Max retries exceeded with url: /5eac3d774a2f87da61c08a94f945beff (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[INFO] download error: HTTPSConnectionPool(host='mirror.ir-datasets.com', port=443): Max retries exceeded with url: /5eac3d774a2f87da61c08a94f945beff (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[WARNING] Download failed: HTTPSConnectionPool(host='mirror.ir-datasets.com', port=443): Max retries exceeded with url: /5eac3d774a2f87da61c08a94f945beff (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
++FAIL  disks45/nocr/trec-robust-2004      queries RuntimeError: ('All download sources failed', [(RequestsDownload('https://trec.nist.gov/data/robust/04.testset.gz', tries=None), ProxyError(MaxRetryError("HTTPSConnectionPool(host='tre
++[INFO] If you have a local copy of https://trec.nist.gov/data/robust/qrels.robust2004.txt, you can symlink it here to avoid downloading it again: /root/.ir_datasets/downloads/123c2a0ba2ec31178cb1050995dcfdfa
++[INFO] download error: HTTPSConnectionPool(host='trec.nist.gov', port=443): Max retries exceeded with url: /data/robust/qrels.robust2004.txt (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[INFO] download error: HTTPSConnectionPool(host='trec.nist.gov', port=443): Max retries exceeded with url: /data/robust/qrels.robust2004.txt (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[WARNING] Download failed: HTTPSConnectionPool(host='trec.nist.gov', port=443): Max retries exceeded with url: /data/robust/qrels.robust2004.txt (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
++[INFO] download error: HTTPSConnectionPool(host='mirror.ir-datasets.com', port=443): Max retries exceeded with url: /123c2a0ba2ec31178cb1050995dcfdfa (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[INFO] download error: HTTPSConnectionPool(host='mirror.ir-datasets.com', port=443): Max retries exceeded with url: /123c2a0ba2ec31178cb1050995dcfdfa (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[WARNING] Download failed: HTTPSConnectionPool(host='mirror.ir-datasets.com', port=443): Max retries exceeded with url: /123c2a0ba2ec31178cb1050995dcfdfa (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
++FAIL  disks45/nocr/trec-robust-2004      qrels   RuntimeError: ('All download sources failed', [(<ir_datasets.util.download.LocalDownload object at 0x7f6205dca710>, FileNotFoundError(PosixPath('/root/.ir_datasets/downloads/123c2a0ba2
++[INFO] The TREC Robust document collection is from TREC disks 4 and 5. Due to the copyrighted nature of the  documents, this collection is for research use only, which requires agreements to be filed with NIST. See details here: <https://trec.nist.gov/data/cd45/index.html>.
++More details about the procedure can be found here: <https://ir-datasets.com/trec-robust04.html#DataAccess>.
++Once completed, place the uncompressed source here: /root/.ir_datasets/disks45/corpus
++This should contain directories like NEWS_data/FBIS, NEWS_data/FR94, etc.
++FAIL  disks45/nocr/trec-robust-2004      docs    FileNotFoundError: /root/.ir_datasets/disks45/corpus
++[INFO] download error: HTTPSConnectionPool(host='trec.nist.gov', port=443): Max retries exceeded with url: /data/core/topics2018.txt (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[INFO] download error: HTTPSConnectionPool(host='trec.nist.gov', port=443): Max retries exceeded with url: /data/core/topics2018.txt (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[WARNING] Download failed: HTTPSConnectionPool(host='trec.nist.gov', port=443): Max retries exceeded with url: /data/core/topics2018.txt (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
++[INFO] download error: HTTPSConnectionPool(host='mirror.ir-datasets.com', port=443): Max retries exceeded with url: /1b11276f0e1badd68347884664816654 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[INFO] download error: HTTPSConnectionPool(host='mirror.ir-datasets.com', port=443): Max retries exceeded with url: /1b11276f0e1badd68347884664816654 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[WARNING] Download failed: HTTPSConnectionPool(host='mirror.ir-datasets.com', port=443): Max retries exceeded with url: /1b11276f0e1badd68347884664816654 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
++FAIL  wapo/v2/trec-core-2018             queries RuntimeError: ('All download sources failed', [(RequestsDownload('https://trec.nist.gov/data/core/topics2018.txt', tries=None), ProxyError(MaxRetryError("HTTPSConnectionPool(host='trec
++[INFO] download error: HTTPSConnectionPool(host='trec.nist.gov', port=443): Max retries exceeded with url: /data/core/qrels2018.txt (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[INFO] download error: HTTPSConnectionPool(host='trec.nist.gov', port=443): Max retries exceeded with url: /data/core/qrels2018.txt (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[WARNING] Download failed: HTTPSConnectionPool(host='trec.nist.gov', port=443): Max retries exceeded with url: /data/core/qrels2018.txt (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
++[INFO] download error: HTTPSConnectionPool(host='mirror.ir-datasets.com', port=443): Max retries exceeded with url: /7a982cd110f8bb30da4141f0f639f2e1 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[INFO] download error: HTTPSConnectionPool(host='mirror.ir-datasets.com', port=443): Max retries exceeded with url: /7a982cd110f8bb30da4141f0f639f2e1 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden'))). Retrying from start.
++[WARNING] Download failed: HTTPSConnectionPool(host='mirror.ir-datasets.com', port=443): Max retries exceeded with url: /7a982cd110f8bb30da4141f0f639f2e1 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
++FAIL  wapo/v2/trec-core-2018             qrels   RuntimeError: ('All download sources failed', [(RequestsDownload('https://trec.nist.gov/data/core/qrels2018.txt', tries=None), ProxyError(MaxRetryError("HTTPSConnectionPool(host='trec.
++[INFO] The Washington Post collection can be requested here: <https://trec.nist.gov/data/wapost/>
++More details about the procedure can be found here: <https://ir-datasets.com/wapo.html#DataAccess>.
++Once completed, place/link the source file: /root/.ir_datasets/wapo/WashingtonPost.v2.tar.gz
++FAIL  wapo/v2/trec-core-2018             docs    FileNotFoundError: /root/.ir_datasets/wapo/WashingtonPost.v2.tar.gz
+diff --git a/logs/headline/04_collect_results.log b/logs/headline/04_collect_results.log
+new file mode 100644
+index 0000000..dc43b7e
+--- /dev/null
++++ b/logs/headline/04_collect_results.log
+@@ -0,0 +1 @@
++0/46 experiments finished -> /home/user/DyVo-CS6101/results/results.csv
+diff --git a/logs/headline/cpu_venv_install.log b/logs/headline/cpu_venv_install.log
+new file mode 100644
+index 0000000..e69de29
+diff --git a/logs/headline/hf_reachability.log b/logs/headline/hf_reachability.log
+new file mode 100644
+index 0000000..745306c
+--- /dev/null
++++ b/logs/headline/hf_reachability.log
+@@ -0,0 +1,11 @@
++https://huggingface.co/api/datasets/lsr42/dyvo_data                                                  CONNECT tunnel failed, response 403
++000
++https://huggingface.co/datasets/lsr42/dyvo_data/resolve/main/dyvo_init/query_encoder/model.safetensors CONNECT tunnel failed, response 403
++000
++https://cdn-lfs.huggingface.co                                                                       CONNECT tunnel failed, response 403
++000
++https://cas-bridge.xethub.hf.co                                                                      CONNECT tunnel failed, response 403
++000
++https://hf-mirror.com/api/datasets/lsr42/dyvo_data                                                   CONNECT tunnel failed, response 403
++000
++https://s3.amazonaws.com/datasets.huggingface.co/                                                    200
+diff --git a/logs/headline/resolved_configs/qmlp_dmlm_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml b/logs/headline/resolved_configs/qmlp_dmlm_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml
+new file mode 100644
+index 0000000..7149879
+--- /dev/null
++++ b/logs/headline/resolved_configs/qmlp_dmlm_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml
+@@ -0,0 +1,103 @@
++query_max_length: 50
++doc_max_length: 512
++tokenizer:
++  _target_: lsr.tokenizer.HFTokenizer
++  tokenizer_name: distilbert-base-uncased
++data_collator:
++  _target_: lsr.datasets.data_collator.DataCollator
++  tokenizer: ${tokenizer}
++  q_max_length: ${query_max_length}
++  d_max_length: ${doc_max_length}
++training_arguments:
++  _target_: transformers.TrainingArguments
++  overwrite_output_dir: true
++  remove_unused_columns: false
++  do_train: true
++  evaluation_strategy: steps
++  log_level: info
++  logging_steps: 500
++  per_device_train_batch_size: 16
++  max_steps: 100000
++  save_total_limit: 2
++  save_strategy: steps
++  save_steps: 5000
++  warmup_steps: 0
++  fp16: true
++  report_to: wandb
++  dataloader_num_workers: 16
++  dataloader_drop_last: false
++  ignore_data_skip: false
++  ddp_find_unused_parameters: false
++  seed: 42
++  eval_steps: 5000
++  per_device_eval_batch_size: 64
++  learning_rate: 5.0e-07
++  warmup_ratio: 0.1
++trainer:
++  _target_: lsr.trainer.HFTrainer
++  model: ${model}
++  args: ${training_arguments}
++  data_collator: ${data_collator}
++  train_dataset: ${train_dataset}
++  loss: ${loss}
++  eval_dataset: ${eval_dataset}
++resume_from_checkpoint: false
++model:
++  _target_: lsr.models.DualSparseEncoder
++  query_encoder:
++    _target_: lsr.models.TransformerMLPSparseEncoder
++  doc_encoder:
++    _target_: lsr.models.TransformerMLMSparseEncoder
++  query_encoder_checkpoint: dyvo_data/dyvo_init/query_encoder/model.safetensors
++  doc_encoder_checkpoint: dyvo_data/dyvo_init/doc_encoder/model.safetensors
++train_dataset:
++  _target_: lsr.datasets.TripletIDDistilDataset
++  collection_path: irds:codec
++  doc_fields:
++  - title
++  - text
++  queries_path: dyvo_data/codec/codec_mistral_topics.tsv
++  qrels_path: dyvo_data/codec/codec_mistral_qrels.json
++  ce_score_dict: dyvo_data/codec/codec_monot5_3b_scores.json
++loss:
++  _target_: lsr.losses.EntityDistilKLLoss
++  q_regularizer:
++    _target_: lsr.losses.regularizer.L1
++    weight: 0.0
++    T: 50000
++  d_regularizer:
++    _target_: lsr.losses.regularizer.L1
++    weight: 1.0e-05
++    T: 50000
++  normalize: std
++wandb:
++  setup:
++    project: lsr-entities
++    entity: null
++    mode: online
++  watch:
++    log: all
++    log_freq: 100
++  resume: false
++eval_dataset:
++  _target_: lsr.datasets.prediction_dataset.PredictionDataset
++  docs_path: irds:codec
++  doc_field:
++  - title
++  - text
++  query_field:
++  - query
++  queries_path: irds:codec
++  qrels_path: irds:codec
++  num_documents: 100000
++test_dataset:
++  _target_: lsr.datasets.prediction_dataset.PredictionDataset
++  docs_path: irds:codec
++  doc_field:
++  - title
++  - text
++  query_field:
++  - query
++  queries_path: irds:codec
++  qrels_path: irds:codec
++  num_documents: -1
+diff --git a/logs/headline/resolved_configs/qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.yaml b/logs/headline/resolved_configs/qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.yaml
+new file mode 100644
+index 0000000..fbadb05
+--- /dev/null
++++ b/logs/headline/resolved_configs/qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.yaml
+@@ -0,0 +1,129 @@
++query_max_length: 50
++doc_max_length: 512
++tokenizer:
++  _target_: lsr.tokenizer.HFTokenizer
++  tokenizer_name: distilbert-base-uncased
++data_collator:
++  _target_: lsr.datasets.text_entity_collator.DynamicDataCollator
++  tokenizer: ${tokenizer}
++  q_max_length: ${query_max_length}
++  d_max_length: ${doc_max_length}
++  candidate_retriever: ${entity_candidate_retriever}
++  entity_dim: 768
++training_arguments:
++  _target_: transformers.TrainingArguments
++  overwrite_output_dir: true
++  remove_unused_columns: false
++  do_train: true
++  evaluation_strategy: steps
++  log_level: info
++  logging_steps: 500
++  per_device_train_batch_size: 16
++  max_steps: 100000
++  save_total_limit: 2
++  save_strategy: steps
++  save_steps: 5000
++  warmup_steps: 0
++  fp16: true
++  report_to: wandb
++  dataloader_num_workers: 16
++  dataloader_drop_last: false
++  ignore_data_skip: false
++  ddp_find_unused_parameters: false
++  seed: 42
++  eval_steps: 5000
++  per_device_eval_batch_size: 64
++  learning_rate: 5.0e-07
++  warmup_ratio: 0.1
++trainer:
++  _target_: lsr.trainer.HFTrainer
++  model: ${model}
++  args: ${training_arguments}
++  data_collator: ${data_collator}
++  train_dataset: ${train_dataset}
++  loss: ${loss}
++  eval_dataset: ${eval_dataset}
++resume_from_checkpoint: false
++model:
++  _target_: lsr.models.DualSparseEncoder
++  query_encoder:
++    _target_: lsr.models.mlp_emlm.TransformerMLPeMLMSparseEncoder
++    ent_emb_model: ${entity_embedding_model}
++    config:
++      _target_: lsr.models.mlp_emlm.TransformerMLPeMLMConfig
++      only_entity: false
++      aspect_vector: false
++      sparse_aspect: Flase
++      entity_weight: 0.05
++      entity_dim: 768
++  doc_encoder:
++    _target_: lsr.models.mlm_emlm.TransformerMLMeMLMSparseEncoder
++    ent_emb_model: ${entity_embedding_model}
++    config:
++      _target_: lsr.models.mlm_emlm.TransformerMLMeMLMConfig
++      only_entity: false
++      aspect_vector: false
++      sparse_aspect: false
++      entity_weight: 0.05
++      entity_dim: 768
++  query_encoder_checkpoint: dyvo_data/dyvo_init/query_encoder/model.safetensors
++  doc_encoder_checkpoint: dyvo_data/dyvo_init/doc_encoder/model.safetensors
++train_dataset:
++  _target_: lsr.datasets.TripletIDDistilDataset
++  collection_path: irds:codec
++  doc_fields:
++  - title
++  - text
++  queries_path: dyvo_data/codec/codec_mistral_topics.tsv
++  qrels_path: dyvo_data/codec/codec_mistral_qrels.json
++  ce_score_dict: dyvo_data/codec/codec_monot5_3b_scores.json
++loss:
++  _target_: lsr.losses.EntityDistilKLLoss
++  q_regularizer:
++    _target_: lsr.losses.regularizer.L1
++    weight: 0.0
++    T: 50000
++  d_regularizer:
++    _target_: lsr.losses.regularizer.L1
++    weight: 1.0e-05
++    T: 50000
++  normalize: std
++  reg_ent: false
++wandb:
++  setup:
++    project: lsr-entities
++    entity: null
++    mode: online
++  watch:
++    log: all
++    log_freq: 100
++  resume: false
++eval_dataset:
++  _target_: lsr.datasets.prediction_dataset.PredictionDataset
++  docs_path: irds:codec
++  doc_field:
++  - title
++  - text
++  query_field:
++  - query
++  queries_path: irds:codec
++  qrels_path: irds:codec
++  num_documents: 100000
++test_dataset:
++  _target_: lsr.datasets.prediction_dataset.PredictionDataset
++  docs_path: irds:codec
++  doc_field:
++  - title
++  - text
++  query_field:
++  - query
++  queries_path: irds:codec
++  qrels_path: irds:codec
++  num_documents: -1
++entity_embedding_model:
++  _target_: lsr.models.entity_emb.BertEntityEmbedding
++  entity_emb_path: dyvo_data/knowledge_base/entity_embs_laque.pt
++entity_candidate_retriever:
++  _target_: lsr.entity.bert_candidates.BERTCandidate
++  query_ent_path: dyvo_data/codec/queries_test_train_entities_rel.jsonl
++  doc_ent_path: dyvo_data/codec/docs_entities.jsonl
+diff --git a/logs/headline/resolved_configs/qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.yaml b/logs/headline/resolved_configs/qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.yaml
+new file mode 100644
+index 0000000..51ef95c
+--- /dev/null
++++ b/logs/headline/resolved_configs/qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.yaml
+@@ -0,0 +1,129 @@
++query_max_length: 50
++doc_max_length: 512
++tokenizer:
++  _target_: lsr.tokenizer.HFTokenizer
++  tokenizer_name: distilbert-base-uncased
++data_collator:
++  _target_: lsr.datasets.text_entity_collator.DynamicDataCollator
++  tokenizer: ${tokenizer}
++  q_max_length: ${query_max_length}
++  d_max_length: ${doc_max_length}
++  candidate_retriever: ${entity_candidate_retriever}
++  entity_dim: 768
++training_arguments:
++  _target_: transformers.TrainingArguments
++  overwrite_output_dir: true
++  remove_unused_columns: false
++  do_train: true
++  evaluation_strategy: steps
++  log_level: info
++  logging_steps: 500
++  per_device_train_batch_size: 16
++  max_steps: 100000
++  save_total_limit: 2
++  save_strategy: steps
++  save_steps: 5000
++  warmup_steps: 0
++  fp16: true
++  report_to: wandb
++  dataloader_num_workers: 16
++  dataloader_drop_last: false
++  ignore_data_skip: false
++  ddp_find_unused_parameters: false
++  seed: 42
++  eval_steps: 5000
++  per_device_eval_batch_size: 64
++  learning_rate: 5.0e-07
++  warmup_ratio: 0.1
++trainer:
++  _target_: lsr.trainer.HFTrainer
++  model: ${model}
++  args: ${training_arguments}
++  data_collator: ${data_collator}
++  train_dataset: ${train_dataset}
++  loss: ${loss}
++  eval_dataset: ${eval_dataset}
++resume_from_checkpoint: false
++model:
++  _target_: lsr.models.DualSparseEncoder
++  query_encoder:
++    _target_: lsr.models.mlp_emlm.TransformerMLPeMLMSparseEncoder
++    ent_emb_model: ${entity_embedding_model}
++    config:
++      _target_: lsr.models.mlp_emlm.TransformerMLPeMLMConfig
++      only_entity: false
++      aspect_vector: false
++      sparse_aspect: false
++      entity_weight: 0.05
++      entity_dim: 768
++  doc_encoder:
++    _target_: lsr.models.mlm_emlm.TransformerMLMeMLMSparseEncoder
++    ent_emb_model: ${entity_embedding_model}
++    config:
++      _target_: lsr.models.mlm_emlm.TransformerMLMeMLMConfig
++      only_entity: false
++      aspect_vector: false
++      sparse_aspect: false
++      entity_weight: 0.05
++      entity_dim: 768
++  query_encoder_checkpoint: dyvo_data/dyvo_init/query_encoder/model.safetensors
++  doc_encoder_checkpoint: dyvo_data/dyvo_init/doc_encoder/model.safetensors
++train_dataset:
++  _target_: lsr.datasets.TripletIDDistilDataset
++  collection_path: irds:disks45/nocr/trec-robust-2004
++  doc_fields:
++  - title
++  - body
++  queries_path: dyvo_data/robust04/robust04_inparsv2_topics.tsv
++  qrels_path: dyvo_data/robust04/robust04_inparsv2_qrels.json
++  ce_score_dict: dyvo_data/robust04/robust04_monot5_3b_scores.json
++loss:
++  _target_: lsr.losses.EntityDistilKLLoss
++  q_regularizer:
++    _target_: lsr.losses.regularizer.L1
++    weight: 0.0
++    T: 50000
++  d_regularizer:
++    _target_: lsr.losses.regularizer.L1
++    weight: 1.0e-05
++    T: 50000
++  normalize: std
++  reg_ent: false
++wandb:
++  setup:
++    project: lsr-entities
++    entity: null
++    mode: online
++  watch:
++    log: all
++    log_freq: 100
++  resume: false
++eval_dataset:
++  _target_: lsr.datasets.prediction_dataset.PredictionDataset
++  docs_path: irds:disks45/nocr/trec-robust-2004
++  doc_field:
++  - title
++  - body
++  query_field:
++  - description
++  queries_path: irds:disks45/nocr/trec-robust-2004
++  qrels_path: irds:disks45/nocr/trec-robust-2004
++  num_documents: 100000
++test_dataset:
++  _target_: lsr.datasets.prediction_dataset.PredictionDataset
++  docs_path: irds:disks45/nocr/trec-robust-2004
++  doc_field:
++  - title
++  - body
++  query_field:
++  - description
++  queries_path: irds:disks45/nocr/trec-robust-2004
++  qrels_path: irds:disks45/nocr/trec-robust-2004
++  num_documents: -1
++entity_embedding_model:
++  _target_: lsr.models.entity_emb.BertEntityEmbedding
++  entity_emb_path: dyvo_data/knowledge_base/entity_embs_laque.pt
++entity_candidate_retriever:
++  _target_: lsr.entity.bert_candidates.BERTCandidate
++  query_ent_path: dyvo_data/robust04/queries_test_train_entities_rel.jsonl
++  doc_ent_path: dyvo_data/robust04/docs_entities.jsonl
+diff --git a/logs/headline/resolved_configs/qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.yaml b/logs/headline/resolved_configs/qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.yaml
+new file mode 100644
+index 0000000..d00cccf
+--- /dev/null
++++ b/logs/headline/resolved_configs/qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.yaml
+@@ -0,0 +1,129 @@
++query_max_length: 50
++doc_max_length: 512
++tokenizer:
++  _target_: lsr.tokenizer.HFTokenizer
++  tokenizer_name: distilbert-base-uncased
++data_collator:
++  _target_: lsr.datasets.text_entity_collator.DynamicDataCollator
++  tokenizer: ${tokenizer}
++  q_max_length: ${query_max_length}
++  d_max_length: ${doc_max_length}
++  candidate_retriever: ${entity_candidate_retriever}
++  entity_dim: 768
++training_arguments:
++  _target_: transformers.TrainingArguments
++  overwrite_output_dir: true
++  remove_unused_columns: false
++  do_train: true
++  evaluation_strategy: steps
++  log_level: info
++  logging_steps: 500
++  per_device_train_batch_size: 16
++  max_steps: 100000
++  save_total_limit: 2
++  save_strategy: steps
++  save_steps: 5000
++  warmup_steps: 0
++  fp16: true
++  report_to: wandb
++  dataloader_num_workers: 16
++  dataloader_drop_last: false
++  ignore_data_skip: false
++  ddp_find_unused_parameters: false
++  seed: 42
++  eval_steps: 5000
++  per_device_eval_batch_size: 64
++  learning_rate: 5.0e-07
++  warmup_ratio: 0.1
++trainer:
++  _target_: lsr.trainer.HFTrainer
++  model: ${model}
++  args: ${training_arguments}
++  data_collator: ${data_collator}
++  train_dataset: ${train_dataset}
++  loss: ${loss}
++  eval_dataset: ${eval_dataset}
++resume_from_checkpoint: false
++model:
++  _target_: lsr.models.DualSparseEncoder
++  query_encoder:
++    _target_: lsr.models.mlp_emlm.TransformerMLPeMLMSparseEncoder
++    ent_emb_model: ${entity_embedding_model}
++    config:
++      _target_: lsr.models.mlp_emlm.TransformerMLPeMLMConfig
++      only_entity: false
++      aspect_vector: false
++      sparse_aspect: Flase
++      entity_weight: 0.05
++      entity_dim: 768
++  doc_encoder:
++    _target_: lsr.models.mlm_emlm.TransformerMLMeMLMSparseEncoder
++    ent_emb_model: ${entity_embedding_model}
++    config:
++      _target_: lsr.models.mlm_emlm.TransformerMLMeMLMConfig
++      only_entity: false
++      aspect_vector: false
++      sparse_aspect: false
++      entity_weight: 0.05
++      entity_dim: 768
++  query_encoder_checkpoint: dyvo_data/dyvo_init/query_encoder/model.safetensors
++  doc_encoder_checkpoint: dyvo_data/dyvo_init/doc_encoder/model.safetensors
++train_dataset:
++  _target_: lsr.datasets.TripletIDDistilDataset
++  collection_path: irds:wapo/v2/trec-core-2018
++  doc_fields:
++  - title
++  - body
++  queries_path: dyvo_data/wapo/wapo_inparsev2_topics.tsv
++  qrels_path: dyvo_data/wapo/wapo_inparsev2_qrels.json
++  ce_score_dict: dyvo_data/wapo/wapo_monot5_3b_scores.json
++loss:
++  _target_: lsr.losses.EntityDistilKLLoss
++  q_regularizer:
++    _target_: lsr.losses.regularizer.L1
++    weight: 0.0
++    T: 50000
++  d_regularizer:
++    _target_: lsr.losses.regularizer.L1
++    weight: 1.0e-05
++    T: 50000
++  normalize: std
++  reg_ent: false
++wandb:
++  setup:
++    project: lsr-entities
++    entity: null
++    mode: online
++  watch:
++    log: all
++    log_freq: 100
++  resume: false
++eval_dataset:
++  _target_: lsr.datasets.prediction_dataset.PredictionDataset
++  docs_path: irds:wapo/v2/trec-core-2018
++  doc_field:
++  - title
++  - body
++  query_field:
++  - description
++  queries_path: irds:wapo/v2/trec-core-2018
++  qrels_path: irds:wapo/v2/trec-core-2018
++  num_documents: 100000
++test_dataset:
++  _target_: lsr.datasets.prediction_dataset.PredictionDataset
++  docs_path: irds:wapo/v2/trec-core-2018
++  doc_field:
++  - title
++  - body
++  query_field:
++  - description
++  queries_path: irds:wapo/v2/trec-core-2018
++  qrels_path: irds:wapo/v2/trec-core-2018
++  num_documents: -1
++entity_embedding_model:
++  _target_: lsr.models.entity_emb.BertEntityEmbedding
++  entity_emb_path: dyvo_data/knowledge_base/entity_embs_laque.pt
++entity_candidate_retriever:
++  _target_: lsr.entity.bert_candidates.BERTCandidate
++  query_ent_path: dyvo_data/wapo/queries_test_train_entities_rel.jsonl
++  doc_ent_path: dyvo_data/wapo/docs_entities.jsonl
+diff --git a/logs/headline/resolved_configs/qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml b/logs/headline/resolved_configs/qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml
+new file mode 100644
+index 0000000..65a7c86
+--- /dev/null
++++ b/logs/headline/resolved_configs/qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml
+@@ -0,0 +1,103 @@
++query_max_length: 50
++doc_max_length: 512
++tokenizer:
++  _target_: lsr.tokenizer.HFTokenizer
++  tokenizer_name: distilbert-base-uncased
++data_collator:
++  _target_: lsr.datasets.data_collator.DataCollator
++  tokenizer: ${tokenizer}
++  q_max_length: ${query_max_length}
++  d_max_length: ${doc_max_length}
++training_arguments:
++  _target_: transformers.TrainingArguments
++  overwrite_output_dir: true
++  remove_unused_columns: false
++  do_train: true
++  evaluation_strategy: steps
++  log_level: info
++  logging_steps: 500
++  per_device_train_batch_size: 16
++  max_steps: 100000
++  save_total_limit: 2
++  save_strategy: steps
++  save_steps: 5000
++  warmup_steps: 0
++  fp16: true
++  report_to: wandb
++  dataloader_num_workers: 16
++  dataloader_drop_last: false
++  ignore_data_skip: false
++  ddp_find_unused_parameters: false
++  seed: 42
++  eval_steps: 5000
++  per_device_eval_batch_size: 64
++  learning_rate: 5.0e-07
++  warmup_ratio: 0.1
++trainer:
++  _target_: lsr.trainer.HFTrainer
++  model: ${model}
++  args: ${training_arguments}
++  data_collator: ${data_collator}
++  train_dataset: ${train_dataset}
++  loss: ${loss}
++  eval_dataset: ${eval_dataset}
++resume_from_checkpoint: false
++model:
++  _target_: lsr.models.DualSparseEncoder
++  query_encoder:
++    _target_: lsr.models.TransformerMLPSparseEncoder
++  doc_encoder:
++    _target_: lsr.models.TransformerMLMSparseEncoder
++  query_encoder_checkpoint: dyvo_data/dyvo_init/query_encoder/model.safetensors
++  doc_encoder_checkpoint: dyvo_data/dyvo_init/doc_encoder/model.safetensors
++train_dataset:
++  _target_: lsr.datasets.TripletIDDistilDataset
++  collection_path: irds:disks45/nocr/trec-robust-2004
++  doc_fields:
++  - title
++  - body
++  queries_path: dyvo_data/robust04/robust04_inparsv2_topics.tsv
++  qrels_path: dyvo_data/robust04/robust04_inparsv2_qrels.json
++  ce_score_dict: dyvo_data/robust04/robust04_monot5_3b_scores.json
++loss:
++  _target_: lsr.losses.EntityDistilKLLoss
++  q_regularizer:
++    _target_: lsr.losses.regularizer.L1
++    weight: 0.0
++    T: 50000
++  d_regularizer:
++    _target_: lsr.losses.regularizer.L1
++    weight: 1.0e-05
++    T: 50000
++  normalize: std
++wandb:
++  setup:
++    project: lsr-entities
++    entity: null
++    mode: online
++  watch:
++    log: all
++    log_freq: 100
++  resume: false
++eval_dataset:
++  _target_: lsr.datasets.prediction_dataset.PredictionDataset
++  docs_path: irds:disks45/nocr/trec-robust-2004
++  doc_field:
++  - title
++  - body
++  query_field:
++  - description
++  queries_path: irds:disks45/nocr/trec-robust-2004/fold1
++  qrels_path: irds:disks45/nocr/trec-robust-2004/fold1
++  num_documents: 100000
++test_dataset:
++  _target_: lsr.datasets.prediction_dataset.PredictionDataset
++  docs_path: irds:disks45/nocr/trec-robust-2004
++  doc_field:
++  - title
++  - body
++  query_field:
++  - description
++  queries_path: irds:disks45/nocr/trec-robust-2004
++  qrels_path: irds:disks45/nocr/trec-robust-2004
++  num_documents: -1
+diff --git a/logs/headline/resolved_configs/qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml b/logs/headline/resolved_configs/qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml
+new file mode 100644
+index 0000000..6aa0a10
+--- /dev/null
++++ b/logs/headline/resolved_configs/qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.yaml
+@@ -0,0 +1,103 @@
++query_max_length: 50
++doc_max_length: 512
++tokenizer:
++  _target_: lsr.tokenizer.HFTokenizer
++  tokenizer_name: distilbert-base-uncased
++data_collator:
++  _target_: lsr.datasets.data_collator.DataCollator
++  tokenizer: ${tokenizer}
++  q_max_length: ${query_max_length}
++  d_max_length: ${doc_max_length}
++training_arguments:
++  _target_: transformers.TrainingArguments
++  overwrite_output_dir: true
++  remove_unused_columns: false
++  do_train: true
++  evaluation_strategy: steps
++  log_level: info
++  logging_steps: 500
++  per_device_train_batch_size: 16
++  max_steps: 100000
++  save_total_limit: 2
++  save_strategy: steps
++  save_steps: 5000
++  warmup_steps: 0
++  fp16: true
++  report_to: wandb
++  dataloader_num_workers: 16
++  dataloader_drop_last: false
++  ignore_data_skip: false
++  ddp_find_unused_parameters: false
++  seed: 42
++  eval_steps: 5000
++  per_device_eval_batch_size: 64
++  learning_rate: 5.0e-07
++  warmup_ratio: 0.1
++trainer:
++  _target_: lsr.trainer.HFTrainer
++  model: ${model}
++  args: ${training_arguments}
++  data_collator: ${data_collator}
++  train_dataset: ${train_dataset}
++  loss: ${loss}
++  eval_dataset: ${eval_dataset}
++resume_from_checkpoint: false
++model:
++  _target_: lsr.models.DualSparseEncoder
++  query_encoder:
++    _target_: lsr.models.TransformerMLPSparseEncoder
++  doc_encoder:
++    _target_: lsr.models.TransformerMLMSparseEncoder
++  query_encoder_checkpoint: dyvo_data/dyvo_init/query_encoder/model.safetensors
++  doc_encoder_checkpoint: dyvo_data/dyvo_init/doc_encoder/model.safetensors
++train_dataset:
++  _target_: lsr.datasets.TripletIDDistilDataset
++  collection_path: irds:wapo/v2/trec-core-2018
++  doc_fields:
++  - title
++  - body
++  queries_path: dyvo_data/wapo/wapo_inparsev2_topics.tsv
++  qrels_path: dyvo_data/wapo/wapo_inparsev2_qrels.json
++  ce_score_dict: dyvo_data/wapo/wapo_monot5_3b_scores.json
++loss:
++  _target_: lsr.losses.EntityDistilKLLoss
++  q_regularizer:
++    _target_: lsr.losses.regularizer.L1
++    weight: 0.0
++    T: 50000
++  d_regularizer:
++    _target_: lsr.losses.regularizer.L1
++    weight: 1.0e-05
++    T: 50000
++  normalize: std
++wandb:
++  setup:
++    project: lsr-entities
++    entity: null
++    mode: online
++  watch:
++    log: all
++    log_freq: 100
++  resume: false
++eval_dataset:
++  _target_: lsr.datasets.prediction_dataset.PredictionDataset
++  docs_path: irds:wapo/v2/trec-core-2018
++  doc_field:
++  - title
++  - body
++  query_field:
++  - description
++  queries_path: irds:wapo/v2/trec-core-2018
++  qrels_path: irds:wapo/v2/trec-core-2018
++  num_documents: 100000
++test_dataset:
++  _target_: lsr.datasets.prediction_dataset.PredictionDataset
++  docs_path: irds:wapo/v2/trec-core-2018
++  doc_field:
++  - title
++  - body
++  query_field:
++  - description
++  queries_path: irds:wapo/v2/trec-core-2018
++  qrels_path: irds:wapo/v2/trec-core-2018
++  num_documents: -1
+diff --git a/logs/headline/resolved_settings.md b/logs/headline/resolved_settings.md
+new file mode 100644
+index 0000000..07cdf9d
+--- /dev/null
++++ b/logs/headline/resolved_settings.md
+@@ -0,0 +1,8 @@
++| run | batch | lr | max_steps | warmup_ratio | fp16 | q_len / d_len | seed | L1 doc / q | reg_ent | normalize | entity_weight q/d | entity table | query cands | doc cands | init ckpt | train data | tokenizer |
++|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
++| LSR-w codec | 16 | 5e-07 | 100000 | 0.1 | True | 50 / 512 | 42 | 1e-05 / 0.0 | – | std | –/– | – | – | – | query_encoder/model.safetensors | codec_mistral_topics.tsv + codec_monot5_3b_scores.json | distilbert-base-uncased |
++| DyVo codec | 16 | 5e-07 | 100000 | 0.1 | True | 50 / 512 | 42 | 1e-05 / 0.0 | False | std | 0.05/0.05 | entity_embs_laque.pt | queries_test_train_entities_rel.jsonl | docs_entities.jsonl | query_encoder/model.safetensors | codec_mistral_topics.tsv + codec_monot5_3b_scores.json | distilbert-base-uncased |
++| DyVo robust04 | 16 | 5e-07 | 100000 | 0.1 | True | 50 / 512 | 42 | 1e-05 / 0.0 | False | std | 0.05/0.05 | entity_embs_laque.pt | queries_test_train_entities_rel.jsonl | docs_entities.jsonl | query_encoder/model.safetensors | robust04_inparsv2_topics.tsv + robust04_monot5_3b_scores.json | distilbert-base-uncased |
++| DyVo wapo | 16 | 5e-07 | 100000 | 0.1 | True | 50 / 512 | 42 | 1e-05 / 0.0 | False | std | 0.05/0.05 | entity_embs_laque.pt | queries_test_train_entities_rel.jsonl | docs_entities.jsonl | query_encoder/model.safetensors | wapo_inparsev2_topics.tsv + wapo_monot5_3b_scores.json | distilbert-base-uncased |
++| LSR-w robust04 | 16 | 5e-07 | 100000 | 0.1 | True | 50 / 512 | 42 | 1e-05 / 0.0 | – | std | –/– | – | – | – | query_encoder/pytorch_model.bin | robust04_inparsv2_topics.tsv + robust04_monot5_3b_scores.json | distilbert-base-uncased |
++| LSR-w wapo | 16 | 5e-07 | 100000 | 0.1 | True | 50 / 512 | 42 | 1e-05 / 0.0 | – | std | –/– | – | – | – | query_encoder/pytorch_model.bin | wapo_inparsev2_topics.tsv + wapo_monot5_3b_scores.json | distilbert-base-uncased |
+diff --git a/logs/headline/run_priority_dryrun_priority1.log b/logs/headline/run_priority_dryrun_priority1.log
+new file mode 100644
+index 0000000..69a1045
+--- /dev/null
++++ b/logs/headline/run_priority_dryrun_priority1.log
+@@ -0,0 +1,12 @@
++
++[run_priority 11:47:15] data check for 2 experiment(s) (fix every FAIL before training)
++[dry-run] python /home/user/DyVo-CS6101/scripts/big_pc/02_check_data.py --experiments qmlp_dmlm_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001,qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05
++
++[run_priority 11:47:15] group priority1
++[dry-run] cd /home/user/DyVo-CS6101/DyVo && LSR_SCRATCH_DIR=/home/user/DyVo-CS6101/scratch WANDB_MODE=offline nohup python -m lsr.train +experiment=qmlp_dmlm_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001 training_arguments.fp16=True training_arguments.per_device_train_batch_size=16 > /home/user/DyVo-CS6101/logs/qmlp_dmlm_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.log 2>&1 &
++[dry-run] pid -> /home/user/DyVo-CS6101/logs/qmlp_dmlm_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.pid; outputs -> DyVo/outputs/qmlp_dmlm_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001/<date>/ (model/, test_run.trec, test_result.json)
++[dry-run] cd /home/user/DyVo-CS6101/DyVo && LSR_SCRATCH_DIR=/home/user/DyVo-CS6101/scratch WANDB_MODE=offline nohup python -m lsr.train +experiment=qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05 training_arguments.fp16=True training_arguments.per_device_train_batch_size=16 > /home/user/DyVo-CS6101/logs/qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.log 2>&1 &
++[dry-run] pid -> /home/user/DyVo-CS6101/logs/qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.pid; outputs -> DyVo/outputs/qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05/<date>/ (model/, test_run.trec, test_result.json)
++[dry-run] python /home/user/DyVo-CS6101/scripts/big_pc/04_collect_results.py --dry-run
++
++[run_priority 11:47:15] all requested groups done. Results: results/results.csv
+diff --git a/logs/headline/run_priority_dryrun_priority2.log b/logs/headline/run_priority_dryrun_priority2.log
+new file mode 100644
+index 0000000..43f86be
+--- /dev/null
++++ b/logs/headline/run_priority_dryrun_priority2.log
+@@ -0,0 +1,16 @@
++
++[run_priority 11:47:15] data check for 4 experiment(s) (fix every FAIL before training)
++[dry-run] python /home/user/DyVo-CS6101/scripts/big_pc/02_check_data.py --experiments qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001,qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05,qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001,qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05
++
++[run_priority 11:47:15] group priority2
++[dry-run] cd /home/user/DyVo-CS6101/DyVo && LSR_SCRATCH_DIR=/home/user/DyVo-CS6101/scratch WANDB_MODE=offline nohup python -m lsr.train +experiment=qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001 training_arguments.fp16=True training_arguments.per_device_train_batch_size=16 > /home/user/DyVo-CS6101/logs/qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.log 2>&1 &
++[dry-run] pid -> /home/user/DyVo-CS6101/logs/qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.pid; outputs -> DyVo/outputs/qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001/<date>/ (model/, test_run.trec, test_result.json)
++[dry-run] cd /home/user/DyVo-CS6101/DyVo && LSR_SCRATCH_DIR=/home/user/DyVo-CS6101/scratch WANDB_MODE=offline nohup python -m lsr.train +experiment=qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05 training_arguments.fp16=True training_arguments.per_device_train_batch_size=16 > /home/user/DyVo-CS6101/logs/qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.log 2>&1 &
++[dry-run] pid -> /home/user/DyVo-CS6101/logs/qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.pid; outputs -> DyVo/outputs/qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05/<date>/ (model/, test_run.trec, test_result.json)
++[dry-run] cd /home/user/DyVo-CS6101/DyVo && LSR_SCRATCH_DIR=/home/user/DyVo-CS6101/scratch WANDB_MODE=offline nohup python -m lsr.train +experiment=qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001 training_arguments.fp16=True training_arguments.per_device_train_batch_size=16 > /home/user/DyVo-CS6101/logs/qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.log 2>&1 &
++[dry-run] pid -> /home/user/DyVo-CS6101/logs/qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001.pid; outputs -> DyVo/outputs/qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001/<date>/ (model/, test_run.trec, test_result.json)
++[dry-run] cd /home/user/DyVo-CS6101/DyVo && LSR_SCRATCH_DIR=/home/user/DyVo-CS6101/scratch WANDB_MODE=offline nohup python -m lsr.train +experiment=qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05 training_arguments.fp16=True training_arguments.per_device_train_batch_size=16 > /home/user/DyVo-CS6101/logs/qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.log 2>&1 &
++[dry-run] pid -> /home/user/DyVo-CS6101/logs/qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05.pid; outputs -> DyVo/outputs/qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05/<date>/ (model/, test_run.trec, test_result.json)
++[dry-run] python /home/user/DyVo-CS6101/scripts/big_pc/04_collect_results.py --dry-run
++
++[run_priority 11:47:15] all requested groups done. Results: results/results.csv
+diff --git a/logs/headline/verify.log b/logs/headline/verify.log
+new file mode 100644
+index 0000000..276d94e
+--- /dev/null
++++ b/logs/headline/verify.log
+@@ -0,0 +1,47 @@
++
++=== [0s] Network guard active
++ok: [offline guard] DNS lookup blocked during verification: 'huggingface.co'
++
++=== [0s] L0: py_compile every .py
++py_compile ok: 135 files
++
++=== [0s] L0: bash -n every .sh
++bash -n ok
++
++=== [0s] L0: import core modules
++/home/user/DyVo-CS6101/.venv/lib/python3.10/site-packages/datasets/__init__.py
++imported 32 submodules of lsr.models/losses/datasets/trainer + entity modules
++
++=== [4s] L0: compose every experiment config (--cfg job)
++configs composed: 73 passed, 0 failed
++
++=== [64s] L0: entity_dim matches each entity table's width
++skipped (unknown table entity_dpr_emb_lsr_cls.pt): dense_sparse_qmlp_dmlm_emlm_retrieval_msmarco_distil_l1_0.0_0.0001
++entity_dim check: 53 DyVo configs checked, 0 mismatches, 1 skipped
++
++=== [71s] L1: pytest
++.............................................................            [100%]
++61 passed in 3.33s
++
++=== [77s] L2: overfit one batch
++step  100  kl=0.00031  nonzero_entities=15/15  lambda_q=0.0646  lambda_d=0.0645
++[SANITY ONLY] loss 0.40368 -> 0.00031 (ratio 0.001, threshold 0.5); non-zero entity weights at end: 15/15; collapse (all entity weights 0) first seen at step: None
++OVERFIT PASS
++
++=== [85s] L3: python -m lsr.train +experiment=smoke_dyvo
++[SANITY ONLY - meaningless numbers] nDCG@10=0.6759 nDCG@20=0.7607 R@1000=1.0000; run file lines=100
++
++=== [97s] L3: python -m lsr.train +experiment=smoke_lsrw
++[SANITY ONLY - meaningless numbers] nDCG@10=0.3342 nDCG@20=0.4901 R@1000=1.0000; run file lines=100
++
++=== [108s] L4: big-PC scripts --dry-run
++dry-run ok: 00_setup_env.sh
++dry-run ok: 01_list_and_download_data.py
++dry-run ok: 02_check_data.py
++dry-run ok: 03_train.sh
++dry-run ok: 04_collect_results.py
++dry-run ok: 05_generate_entities.sh
++dry-run ok: experiments.py
++dry-run ok: run_priority.sh
++
++=== [109s] VERIFY PASSED (total 109s)
+diff --git a/logs/headline/verify_after_fixes.log b/logs/headline/verify_after_fixes.log
+new file mode 100644
+index 0000000..cef7444
+--- /dev/null
++++ b/logs/headline/verify_after_fixes.log
+@@ -0,0 +1,47 @@
++
++=== [0s] Network guard active
++ok: [offline guard] DNS lookup blocked during verification: 'huggingface.co'
++
++=== [0s] L0: py_compile every .py
++py_compile ok: 135 files
++
++=== [0s] L0: bash -n every .sh
++bash -n ok
++
++=== [0s] L0: import core modules
++/home/user/DyVo-CS6101/.venv/lib/python3.10/site-packages/datasets/__init__.py
++imported 32 submodules of lsr.models/losses/datasets/trainer + entity modules
++
++=== [3s] L0: compose every experiment config (--cfg job)
++configs composed: 73 passed, 0 failed
++
++=== [64s] L0: entity_dim matches each entity table's width
++skipped (unknown table entity_dpr_emb_lsr_cls.pt): dense_sparse_qmlp_dmlm_emlm_retrieval_msmarco_distil_l1_0.0_0.0001
++entity_dim check: 53 DyVo configs checked, 0 mismatches, 1 skipped
++
++=== [71s] L1: pytest
++.............................................................            [100%]
++61 passed in 3.09s
++
++=== [76s] L2: overfit one batch
++step  100  kl=0.00031  nonzero_entities=15/15  lambda_q=0.0646  lambda_d=0.0645
++[SANITY ONLY] loss 0.40368 -> 0.00031 (ratio 0.001, threshold 0.5); non-zero entity weights at end: 15/15; collapse (all entity weights 0) first seen at step: None
++OVERFIT PASS
++
++=== [85s] L3: python -m lsr.train +experiment=smoke_dyvo
++[SANITY ONLY - meaningless numbers] nDCG@10=0.6759 nDCG@20=0.7607 R@1000=1.0000; run file lines=100
++
++=== [97s] L3: python -m lsr.train +experiment=smoke_lsrw
++[SANITY ONLY - meaningless numbers] nDCG@10=0.3342 nDCG@20=0.4901 R@1000=1.0000; run file lines=100
++
++=== [108s] L4: big-PC scripts --dry-run
++dry-run ok: 00_setup_env.sh
++dry-run ok: 01_list_and_download_data.py
++dry-run ok: 02_check_data.py
++dry-run ok: 03_train.sh
++dry-run ok: 04_collect_results.py
++dry-run ok: 05_generate_entities.sh
++dry-run ok: experiments.py
++dry-run ok: run_priority.sh
++
++=== [109s] VERIFY PASSED (total 109s)
+diff --git a/requirements-lock.txt b/requirements-lock.txt
+index 15c5014..f6240fa 100644
+--- a/requirements-lock.txt
++++ b/requirements-lock.txt
+@@ -1,3 +1,6 @@
++# DYVO-REPRO (headline stage): removed 7 unused, mutually inconsistent pins (googleapis-common-protos==1.75.3 needs
++# protobuf>=6.33.5, opentelemetry-*==1.44.0 need protobuf>=5; both clash with protobuf==4.25.9 required by wandb 0.16.6).
++# With them removed, the lock installs on Linux and 'pip check' is clean: nothing in the project depends on them.
+ accelerate==0.30.1
+ aiohappyeyeballs==2.7.1
+ aiohttp==3.14.3
+@@ -20,7 +23,6 @@ frozenlist==1.8.0
+ fsspec==2024.3.1
+ gitdb==4.0.12
+ gitpython==3.1.62
+-googleapis-common-protos==1.75.3
+ hf-xet==1.6.0
+ huggingface-hub==0.36.2
+ hydra-core==1.3.2
+@@ -38,12 +40,6 @@ multiprocess==0.70.16
+ networkx==3.4.2
+ numpy==1.26.4
+ omegaconf==2.3.1
+-opentelemetry-api==1.44.0
+-opentelemetry-exporter-otlp-proto-common==1.44.0
+-opentelemetry-exporter-otlp-proto-http==1.44.0
+-opentelemetry-proto==1.44.0
+-opentelemetry-sdk==1.44.0
+-opentelemetry-semantic-conventions==0.65b0
+ packaging==26.3
+ pandas==2.3.3
+ pillow==12.3.0
+diff --git a/results/results.csv b/results/results.csv
+new file mode 100644
+index 0000000..2df56db
+--- /dev/null
++++ b/results/results.csv
+@@ -0,0 +1,47 @@
++dataset,method,l1,experiment,status,source,ours_nDCG@10,paper_nDCG@10,diff_nDCG@10,ours_nDCG@20,paper_nDCG@20,diff_nDCG@20,ours_R@1000,paper_R@1000,diff_R@1000
++CODEC,LSR-w,1e-5,qmlp_dmlm_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001,not run,,,52.61,,,49.22,,,69.07,
++CODEC,DyVo (REL),1e-5,qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05,not run,,,53.40,,,51.15,,,70.60,
++Robust04,LSR-w,1e-5,qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001,not run,,,49.13,,,46.34,,,66.86,
++Robust04,DyVo (REL),1e-5,qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05,not run,,,51.19,,,47.65,,,68.56,
++Core18,LSR-w,1e-5,qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001,not run,,,40.99,,,38.73,,,63.22,
++Core18,DyVo (REL),1e-5,qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05,not run,,,43.72,,,40.56,,,63.56,
++CODEC,LSR-w,1e-3,qmlp_dmlm_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.001,not run,,,39.10,,,35.32,,,57.58,
++CODEC,DyVo (REL),1e-3,qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.001_entw_0.05,not run,,,42.67,,,38.32,,,59.81,
++Robust04,LSR-w,1e-3,qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.001,not run,,,40.37,,,37.23,,,55.66,
++Robust04,DyVo (REL),1e-3,qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.001_entw_0.05,not run,,,41.52,,,38.62,,,56.78,
++Core18,LSR-w,1e-3,qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.001,not run,,,34.50,,,31.45,,,52.66,
++Core18,DyVo (REL),1e-3,qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.001_entw_0.05,not run,,,37.50,,,34.61,,,54.14,
++CODEC,LSR-w,1e-4,qmlp_dmlm_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.0001,not run,,,50.54,,,46.71,,,66.39,
++CODEC,DyVo (REL),1e-4,qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.0001_entw_0.05,not run,,,51.66,,,47.95,,,68.49,
++Robust04,LSR-w,1e-4,qmlp_dmlm_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.0001,not run,,,47.69,,,44.48,,,64.47,
++Robust04,DyVo (REL),1e-4,qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.0001_entw_0.05,not run,,,48.15,,,44.85,,,64.72,
++Core18,LSR-w,1e-4,qmlp_dmlm_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.0001,not run,,,38.94,,,37.37,,,60.44,
++Core18,DyVo (REL),1e-4,qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.0001_entw_0.05,not run,,,43.10,,,39.46,,,60.43,
++CODEC,DyVo (GPT4),1e-5,qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,56.46,,,53.72,,,74.47,
++CODEC,DyVo (Mixtral),1e-5,qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_mistral,not run,,,54.90,,,52.82,,,73.20,
++CODEC,DyVo (BM25),1e-5,qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_bm25,not run,,,53.25,,,49.80,,,69.83,
++CODEC,DyVo (LaQue),1e-5,qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_laquecand,not run,,,53.73,,,50.34,,,70.87,
++CODEC,DyVo (Human),1e-5,qmlp_dmlm_emlm_laque_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_human,not run,,,56.42,,,52.96,,,75.13,
++Robust04,DyVo (GPT4),1e-5,qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,54.39,,,50.89,,,70.86,
++Robust04,DyVo (Mixtral),1e-5,qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_mistral,not run,,,52.97,,,49.21,,,69.28,
++Robust04,DyVo (BM25),1e-5,qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_bm25,not run,,,51.38,,,47.72,,,67.74,
++Robust04,DyVo (LaQue),1e-5,qmlp_dmlm_emlm_laque_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_laquecand,not run,,,49.42,,,46.31,,,68.25,
++Core18,DyVo (GPT4),1e-5,qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,43.06,,,42.25,,,68.57,
++Core18,DyVo (Mixtral),1e-5,qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_mistral,not run,,,43.80,,,41.86,,,68.27,
++Core18,DyVo (BM25),1e-5,qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_bm25,not run,,,42.48,,,38.89,,,64.58,
++Core18,DyVo (LaQue),1e-5,qmlp_dmlm_emlm_laque_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_laquecand,not run,,,40.24,,,38.39,,,64.83,
++CODEC,DyVo (GPT4) Token Aggr.,1e-5,qmlp_dmlm_emlm_bert_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,53.44,,,50.39,,,69.94,
++CODEC,DyVo (GPT4) DPR,1e-5,qmlp_dmlm_emlm_dpr_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,53.04,,,49.18,,,75.19,
++CODEC,DyVo (GPT4) JDS,1e-5,qmlp_dmlm_emlm_jds_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,55.08,,,50.93,,,73.97,
++CODEC,DyVo (GPT4) Wiki2Vec,1e-5,qmlp_dmlm_emlm_wiki2vec_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,56.30,,,53.25,,,73.03,
++CODEC,DyVo (GPT4) BLINK,1e-5,qmlp_dmlm_emlm_blink_codec_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,58.15,,,54.83,,,74.72,
++Robust04,DyVo (GPT4) Token Aggr.,1e-5,qmlp_dmlm_emlm_bert_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,51.35,,,48.01,,,67.46,
++Robust04,DyVo (GPT4) DPR,1e-5,qmlp_dmlm_emlm_dpr_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,48.68,,,45.77,,,75.21,
++Robust04,DyVo (GPT4) JDS,1e-5,qmlp_dmlm_emlm_jds_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,51.21,,,48.38,,,73.79,
++Robust04,DyVo (GPT4) Wiki2Vec,1e-5,qmlp_dmlm_emlm_wiki2vec_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,54.04,,,50.21,,,69.85,
++Robust04,DyVo (GPT4) BLINK,1e-5,qmlp_dmlm_emlm_blink_robust04_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,55.56,,,51.71,,,71.81,
++Core18,DyVo (GPT4) Token Aggr.,1e-5,qmlp_dmlm_emlm_bert_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,41.63,,,39.37,,,64.01,
++Core18,DyVo (GPT4) DPR,1e-5,qmlp_dmlm_emlm_dpr_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,40.26,,,37.52,,,70.81,
++Core18,DyVo (GPT4) JDS,1e-5,qmlp_dmlm_emlm_jds_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,44.29,,,41.86,,,70.16,
++Core18,DyVo (GPT4) Wiki2Vec,1e-5,qmlp_dmlm_emlm_wiki2vec_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,44.15,,,43.13,,,67.77,
++Core18,DyVo (GPT4) BLINK,1e-5,qmlp_dmlm_emlm_blink_wapo_msmarco_pretrained_inparsv2_monot53b_distillation_l1_0.0_0.00001_entw_0.05_gpt4,not run,,,44.63,,,42.94,,,69.11,
+diff --git a/scripts/big_pc/02_check_data.py b/scripts/big_pc/02_check_data.py
+index 63e7c42..d1af172 100644
+--- a/scripts/big_pc/02_check_data.py
++++ b/scripts/big_pc/02_check_data.py
+@@ -132,15 +132,17 @@ def check_irds(name, rep):
+     except ImportError:
+         rep.err("ir_datasets not installed")
+         return
+-    base = name.split("/")[0]
+-    home = Path(os.environ.get("IR_DATASETS_HOME", Path.home() / ".ir_datasets"))
+-    root = home / base
+-    if root.exists() and any(root.iterdir()):
+-        rep.ok(f"ir_datasets:{name} has local data under {root}")
+-    else:
+-        key = next((k for k in LICENSED if name.startswith(k.split("/")[0])), None)
+-        rep.warn(f"ir_datasets:{name}: nothing under {root} yet. " + (LICENSED.get(key, "") if key else
+-                 "It may download automatically on first use."))
++    # DYVO-REPRO (headline stage): a non-empty ~/.ir_datasets/<name> folder is not proof that the corpus is there
++    # (CODEC topics/qrels download automatically while its documents are on request; a WaPo folder can hold only
++    # topics), and every run needs the full collection for its final test. So read one real document; ERROR if not.
++    key = next((k for k in LICENSED if name.startswith(k.split("/")[0])), None)
++    try:
++        doc = next(iter(ir_datasets.load(name).docs_iter()))
++        rep.ok(f"ir_datasets:{name}: documents readable (first doc_id {doc.doc_id})")
++    except Exception as e:  # noqa: BLE001 - any failure means the corpus is not usable
++        msg = str(e).strip().splitlines()[0][:160] if str(e).strip() else ""
++        rep.err(f"ir_datasets:{name}: documents NOT readable ({type(e).__name__}: {msg}). "
++                + (LICENSED.get(key, "") if key else ""))
+ 
+ 
+ def check_experiment(name, rep, cache):
+-- 
+2.43.0
+
