@@ -1,0 +1,6 @@
+{%- comment -%} Page title block. Params: eyebrow, title, lede {%- endcomment -%}
+<div class="page-head">
+  {% if include.eyebrow %}<p class="eyebrow">{{ include.eyebrow }}</p>{% endif %}
+  <h1>{{ include.title | default: page.title }}</h1>
+  {% if include.lede %}<p class="lede">{{ include.lede }}</p>{% endif %}
+</div>

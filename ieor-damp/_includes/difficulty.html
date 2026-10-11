@@ -1,0 +1,3 @@
+{%- comment -%} Param: value (1-5) {%- endcomment -%}
+{%- assign d = include.value | plus: 0 -%}
+<span class="dots" role="img" aria-label="Difficulty {{ d }} out of 5">{% for i in (1..5) %}<span class="dot{% if i <= d %} on{% endif %}"></span>{% endfor %}<span class="dots-num">{{ d }}/5</span></span>

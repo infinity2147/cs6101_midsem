@@ -1,0 +1,55 @@
+---
+layout: default
+---
+{%- assign tl = site.data.tags -%}
+{%- if page.type == "radar" -%}{%- assign back = "/radar/" -%}{%- assign back_name = "Opportunity Radar" -%}
+{%- elsif page.type == "course-review" -%}{%- assign back = "/courses/" -%}{%- assign back_name = "Courses" -%}
+{%- elsif page.type == "internship" or page.type == "research" or page.type == "in-sem" or page.type == "semex" -%}{%- assign back = "/experiences/" -%}{%- assign back_name = "Experiences" -%}
+{%- else -%}{%- assign back = "/posts/" -%}{%- assign back_name = "All posts" -%}{%- endif -%}
+<article class="post">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="{{ back | relative_url }}">← {{ back_name }}</a></nav>
+  <header class="post-head">
+    <p class="eyebrow">{{ tl.type[page.type] | default: page.type }}{% if page.domain %} · {{ tl.domain[page.domain] | default: page.domain }}{% endif %}</p>
+    <h1>{{ page.name | default: page.title }}</h1>
+    {% if page.type != "radar" %}
+    <div class="byline">
+      {% unless page.anonymous %}{% include avatar.html name=page.author photo=page.photo size="md" %}{% endunless %}
+      <span>
+        <span class="byline-name">{% if page.anonymous %}Anonymous{% else %}{{ page.author | default: "Anonymous" }}{% endif %}</span>{% if page.author_year %} · {{ tl.author_year[page.author_year] | default: page.author_year }}{% endif %}{% if page.author_program %}, {{ page.author_program }}{% endif %}<br>
+        <span class="muted">Posted <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%-d %b %Y" }}</time></span>
+      </span>
+    </div>
+    {% endif %}
+  </header>
+
+  {% include sample-banner.html %}
+
+  {% case page.type %}
+    {% when "course-review" %}{% include review-header.html p=page %}
+    {% when "radar" %}{% include radar-header.html p=page %}
+    {% when "internship", "research", "in-sem", "semex" %}{% include experience-header.html p=page %}
+  {% endcase %}
+
+  <div class="prose">
+    {{ content }}
+  </div>
+
+  {% if page.type == "radar" %}
+    {%- assign slug = page.slug -%}
+    {%- assign linked = site.posts | where: "radar", slug -%}
+    <section class="related">
+      <h2>Experiences from people who did it</h2>
+      {% if linked.size > 0 %}
+      <div class="grid cards-2">{% for p in linked %}{% include post-card.html post=p %}{% endfor %}</div>
+      {% else %}
+      <p class="muted">No experience post yet. Did this programme? <a href="{{ '/team/#ask' | relative_url }}">Tell us</a> and we'll help you write it up.</p>
+      {% endif %}
+    </section>
+  {% endif %}
+
+  <footer class="post-foot">
+    {% if page.tags.size > 0 %}<p class="tags">{% for t in page.tags %}<a class="chip" href="{{ back | relative_url }}?tag={{ t | url_encode }}">#{{ t }}</a>{% endfor %}</p>{% endif %}
+    {% if page.type != "course-review" and page.type != "radar" %}<p>{% include verified.html date=page.last_verified %}</p>{% endif %}
+    <p class="muted small">Something here out of date or wrong? <a href="{{ '/team/#ask' | relative_url }}">Let the team know</a>.</p>
+  </footer>
+</article>

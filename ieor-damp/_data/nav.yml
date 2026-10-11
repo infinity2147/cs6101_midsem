@@ -1,0 +1,28 @@
+# Top navigation. Version 1 sections only (spec section 5).
+# Guide = what you read to plan. Common Room = people, rules and support.
+guide:
+  - title: Courses
+    url: /courses/
+    line: Candid reviews with workload, grading and difficulty up front.
+    action: Browse reviews
+  - title: Course Tracks
+    url: /tracks/
+    line: Which electives, minor or honours to take for the career you want.
+    action: Pick a track
+  - title: Opportunity Radar
+    url: /radar/
+    line: Programmes, PIOs and research internships, with the months they open.
+    action: See what's open this month
+  - title: Experiences
+    url: /experiences/
+    line: Internships and in-sem programmes, including how people found them.
+    action: Read experiences
+common_room:
+  - title: Rules and FAQs
+    url: /faq/
+    line: Credits, minors, slot clashes, retagging, each answer linked to the rule.
+    action: Find an answer
+  - title: Team and Ask us
+    url: /team/
+    line: Your DAMP mentors, and a form to ask anything, anonymously if you like.
+    action: Ask a question

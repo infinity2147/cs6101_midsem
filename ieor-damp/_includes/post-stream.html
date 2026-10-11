@@ -1,0 +1,44 @@
+{%- comment -%}
+  A filtered list over the one post collection (F1).
+  Params:
+    types   comma-separated post types this section shows (empty = all except radar)
+    filters comma-separated filter dimensions to show (default: type,domain,year,program)
+{%- endcomment -%}
+{%- assign allowed = include.types | default: "" | split: "," -%}
+{%- assign dims = include.filters | default: "type,domain,year,program" | split: "," -%}
+<section class="stream" data-stream>
+  <form class="filter-bar" data-filter-bar aria-label="Filter posts" onsubmit="return false">
+    {% if dims contains "type" %}
+    <label><span>Type</span><select data-dim="type"><option value="">All types</option>{% for t in site.data.tags.type %}<option value="{{ t[0] }}">{{ t[1] }}</option>{% endfor %}</select></label>
+    {% endif %}
+    {% if dims contains "domain" %}
+    <label><span>Domain</span><select data-dim="domain"><option value="">All domains</option>{% for t in site.data.tags.domain %}<option value="{{ t[0] }}">{{ t[1] }}</option>{% endfor %}</select></label>
+    {% endif %}
+    {% if dims contains "year" %}
+    <label><span>Writer's year</span><select data-dim="year"><option value="">Any year</option>{% for t in site.data.tags.author_year %}<option value="{{ t[0] }}">{{ t[1] }}</option>{% endfor %}</select></label>
+    {% endif %}
+    {% if dims contains "program" %}
+    <label><span>Writer's programme</span><select data-dim="program"><option value="">Any programme</option>{% for t in site.data.tags.author_program %}<option value="{{ t[0] }}">{{ t[1] }}</option>{% endfor %}</select></label>
+    {% endif %}
+    <div class="filter-status">
+      <span data-active-tag hidden></span>
+      <span class="muted" data-count aria-live="polite"></span>
+      <button type="button" class="link-btn" data-clear hidden>Clear filters</button>
+    </div>
+  </form>
+
+  <div class="tag-cloud" data-tag-cloud aria-label="Tags in this section"></div>
+
+  <div class="grid cards-2" data-cards>
+    {%- assign shown = 0 -%}
+    {%- for p in site.posts -%}
+      {%- if p.type == "radar" -%}{%- continue -%}{%- endif -%}
+      {%- if allowed.size > 0 -%}{%- unless allowed contains p.type -%}{%- continue -%}{%- endunless -%}{%- endif -%}
+      {%- include post-card.html post=p -%}
+      {%- assign shown = shown | plus: 1 -%}
+    {%- endfor -%}
+  </div>
+  <p class="empty" data-empty {% if shown > 0 %}hidden{% endif %}>
+    Nothing here yet for these filters. If you have done this, <a href="{{ '/team/#ask' | relative_url }}">tell us</a> and we will help you write it up.
+  </p>
+</section>

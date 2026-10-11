@@ -1,0 +1,19 @@
+{%- comment -%} Ask us form (F6). Posts to the team's Google Form when configured, else opens an email. {%- endcomment -%}
+{%- assign f = site.ask_form -%}
+<form class="ask-form card" id="ask-form"
+  {% if f.action != "" %}action="{{ f.action }}" method="POST" target="ask-sink"{% endif %}
+  data-mailto="{{ site.team_email }}" data-configured="{% if f.action != '' %}1{% else %}0{% endif %}">
+  <label class="check"><input type="checkbox" data-anon checked> Ask anonymously (we won't know who you are)</label>
+  <div class="who" data-who hidden>
+    <label><span>Name</span><input type="text" name="{{ f.entries.name }}" autocomplete="name"></label>
+    <label><span>How we can reply (email or phone)</span><input type="text" name="{{ f.entries.contact }}"></label>
+  </div>
+  <label><span>Your year and programme (optional)</span><input type="text" name="{{ f.entries.year }}" placeholder="e.g. 2nd year, IEOR B.Tech"></label>
+  <label><span>Your question</span><textarea name="{{ f.entries.question }}" rows="4" required placeholder="Anything: a course, a backlog, a minor, an internship, a rule you don't understand."></textarea></label>
+  <div class="form-row">
+    <button class="btn" type="submit">Send question</button>
+    <p class="muted small" data-form-note>{% if f.action != "" %}Goes to the DAMP team's form. Anonymous questions are answered on the FAQ page or at the next session.{% else %}Opens an email to the team.{% endif %}</p>
+  </div>
+  <p class="form-done" data-done hidden role="status">Thanks, your question reached the team.</p>
+</form>
+{% if f.action != "" %}<iframe name="ask-sink" title="Form submission" hidden></iframe>{% endif %}

@@ -1,0 +1,6 @@
+{%- comment -%} Home-page section card: one line and one action (EP style). Param: item {%- endcomment -%}
+<a class="card section-card" href="{{ include.item.url | relative_url }}">
+  <h3>{{ include.item.title }}</h3>
+  <p>{{ include.item.line }}</p>
+  <span class="cta">{{ include.item.action }} <span aria-hidden="true">→</span></span>
+</a>

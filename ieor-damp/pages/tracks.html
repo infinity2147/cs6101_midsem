@@ -1,0 +1,23 @@
+---
+title: Course Tracks
+permalink: /tracks/
+layout: default
+---
+{% include page-head.html eyebrow="The Guide" title="Course Tracks" lede="Goal-based plans: if you want X after graduating, which electives, minor or honours to take, and in which semester. Each track says honestly how much work it is." %}
+
+{%- assign tracks = site.pages | where: "layout", "track" | sort: "order" -%}
+<div class="grid cards-2">
+  {% for t in tracks %}
+  <a class="card section-card" href="{{ t.url | relative_url }}">
+    <p class="post-card-top">{% if t.status == "draft" %}<span class="chip chip-warn">Draft, needs senior check</span>{% else %}<span class="chip chip-ok">Checked by a senior</span>{% endif %}<span class="chip">Effort: {{ t.effort }}</span></p>
+    <h3>{{ t.title }}</h3>
+    <p>{{ t.suits }}</p>
+    <span class="cta">Open track <span aria-hidden="true">→</span></span>
+  </a>
+  {% endfor %}
+</div>
+
+<div class="callout">
+  <p><strong>Coming next:</strong> Consulting and product · Honours in IEOR vs a minor elsewhere · The chill track. Followed a plan close to one of these? <a href="{{ '/team/#ask' | relative_url }}">Help us write it.</a></p>
+</div>
+<p class="muted small">Tracks are suggestions, not rules. Prerequisites, slots and which courses run in a given semester change; check the <a href="{{ site.data.links.official.dept }}">IEOR department page</a> and ASC before you register.</p>

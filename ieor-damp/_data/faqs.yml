@@ -1,0 +1,211 @@
+# Rules and FAQs (F5). EP-style: short, practical answers to questions students actually ask.
+#
+# Rule: every answer links to an official source (`source`) and has a
+# `last_verified` date (YYYY-MM-DD). Leave last_verified empty until someone on
+# the team has checked the answer against that source; the page then shows
+# "Not yet verified". The site never becomes the source of truth.
+#
+# `a` is Markdown. Keep answers under ~120 words; link out for detail.
+# Source keys refer to _data/links.yml -> official.
+
+- id: credits
+  topic: Credits and CPI
+  items:
+    - q: How are SPI and CPI calculated?
+      a: |
+        Each grade has a point value (AA = 10, AB = 9, BB = 8, BC = 7, CC = 6, CD = 5, DD = 4; a fail gets 0).
+        SPI is the credit-weighted average for one semester; CPI is the same average over every semester so far.
+        So a 6-credit course moves your CPI more than a 3-credit one. How a failed course counts once you
+        clear it is set by the UG rules, so check there before you do the maths for a backlog.
+      source: ugrules
+      last_verified:
+    - q: How many credits does the IEOR B.Tech need, and how are they split?
+      a: |
+        The curriculum on the department site lists the total and the split between core, department
+        electives, institute electives, HSS and other requirements. Note that minors and honours are on top of
+        these totals. Our batches follow the curriculum of the year we joined, so read the version for your batch.
+      source: dept
+      last_verified:
+    - q: How many credits can I register for in a semester?
+      a: |
+        The UG rules set a minimum and a maximum load per semester. Going above the normal load usually needs
+        approval and a good CPI. Before you overload for a minor, check the maximum on ASC during registration.
+        Talk to your faculty advisor too.
+      source: ugrules
+      last_verified:
+    - q: What happens if I fail a course?
+      a: |
+        A failed core course has to be cleared, usually by re-registering when it is next offered (sometimes in
+        a summer or a later semester). A failed elective can often be replaced by another elective; check the rules.
+        Plan the next semester's load with your faculty advisor or a DAMP mentor. You are not the first, and it is
+        recoverable. [Ask us](/team/#ask) if you want to talk it through, anonymously if you like.
+      source: ugrules
+      last_verified:
+
+- id: minors
+  topic: Honours and minors
+  items:
+    - q: What is the difference between a minor and honours?
+      a: |
+        A **minor** is a set of courses in *another* department (for example DS, CS, Economics or Management).
+        **Honours** is a set of extra advanced courses in your *own* department, so for us that means IEOR. Both are
+        on top of the degree requirements and both appear on your transcript. Each has its own CPI conditions.
+      source: ugrules
+      last_verified:
+    - q: Who is eligible for a minor or honours, and when do I apply?
+      a: |
+        Eligibility depends on CPI and on having no pending backlogs, and the cut-offs can differ by batch.
+        Applications open in a fixed window around semester registration, usually announced by the academic
+        office. **The rules for the 2024 and later IEOR batches are being confirmed with the department office**;
+        until then, ask the department before planning around a minor.
+      source: acad
+      last_verified:
+    - q: Can I do both a minor and honours?
+      a: |
+        Usually yes, if you meet both sets of conditions. It is a heavy load, though. Check that the slots work
+        semester by semester before you commit; a clash with a core course always loses.
+      source: ugrules
+      last_verified:
+    - q: Can I drop a minor or honours midway?
+      a: |
+        Yes. Courses you have already finished still appear on your transcript, but they do not earn the minor or
+        honours. Find out what happens to their grades before you drop.
+      source: ugrules
+      last_verified:
+    - q: I'm from another branch. Which courses count for the IEOR minor?
+      a: |
+        According to Mech DAMP's IEOR track (2024), the minor needs at least two courses from IE 501, IE 503,
+        IE 630 and IE 621, and IE 605, IE 614, IE 684, IE 507 and IE 509 do not count. The basket can change, so
+        confirm the current list with the IEOR department before you register.
+      source: dept
+      last_verified:
+
+- id: registration
+  topic: Registration, tagging and slot clashes
+  items:
+    - q: What is the difference between tagging a course as DE and as IE?
+      a: |
+        The tag decides which requirement the credits count towards. A department elective (DE) counts towards
+        your IEOR elective credits; an institute elective (IE) counts towards the institute elective credits. You
+        choose the tag when you register on ASC. Get it right then, because changing it later needs a request.
+      source: asc
+      last_verified:
+    - q: Can I change a course's tag after doing it (retagging)?
+      a: |
+        Sometimes. Retagging is a request to the academic office within a set window, and not every change is
+        allowed. For example, a course cannot count towards two requirements. Check the current form and window on
+        the academic office site, and keep your faculty advisor in the loop.
+      source: acad
+      last_verified:
+    - q: ASC says "Instructor Consent Required". What do I do?
+      a: |
+        Send the consent request on ASC, then email the instructor a short note: your year, your programme,
+        relevant courses you have done, and why you want the course. Consent has to come through before add/drop
+        closes, so request it early and register for a backup course in another slot.
+      source: asc
+      last_verified:
+    - q: The elective I want clashes with a core course slot. Can I take it?
+      a: |
+        Generally no. ASC will not register two courses in the same slot, and the core course takes priority.
+        Look for the same course in another semester, or another section in a different slot. Some
+        instructors allow a clash with only a tutorial or lab hour, but that is the instructor's call, not a rule.
+      source: asc
+      last_verified:
+    - q: I missed the registration deadline. What now?
+      a: |
+        Contact the academic office and your faculty advisor immediately. Late registration is usually possible
+        for a short period, sometimes with a fine. Do not wait until classes have started.
+      source: acad
+      last_verified:
+    - q: When is add/drop, and what can I change in it?
+      a: |
+        Add/drop is a short window at the start of each semester when you can add or drop courses on ASC. The
+        dates are on the academic calendar. Attend the first lectures of courses you are unsure about, and decide
+        before the window closes.
+      source: acad
+      last_verified:
+
+- id: semex
+  topic: Semester exchange
+  items:
+    - q: How do I apply for a semester exchange?
+      a: |
+        The International Relations office announces exchange openings, with the partner universities and the
+        CPI requirements. Applications usually close about a year before the exchange semester. Watch the IR office
+        announcements and webmail from your 2nd year onwards. See the [Radar entry](/radar/) for usual months.
+      source: ir
+      last_verified:
+    - q: Will the courses I take abroad count towards my degree?
+      a: |
+        Only if they are pre-approved. Before you leave, get the department to approve which IITB courses the
+        partner university's courses will substitute for. Ask how the grades will appear on your transcript.
+        Without approval, credits may not transfer.
+      source: ir
+      last_verified:
+
+- id: branch
+  topic: Branch change and dual degree
+  items:
+    - q: Can I change my branch into or out of IEOR?
+      a: |
+        Branch change happens after the first year, based on CPI and the seats available, under institute rules.
+        The academic office announces the process and results. There is no separate IEOR process.
+      source: acad
+      last_verified:
+    - q: Is there a dual degree (B.Tech + M.Tech) option in IEOR?
+      a: |
+        We have not confirmed this for the IEOR B.Tech batches yet. The department office is the right place to
+        ask. We will update this answer once we have it in writing.
+      source: dept
+      last_verified:
+
+- id: internships
+  topic: Internships and the placement office
+  items:
+    - q: How do internships through the institute work?
+      a: |
+        The Placement Office runs the internship process: you register on the placement portal, companies
+        shortlist from resumes, and tests and interviews follow. The process has rules on how many offers you can
+        hold and what happens once you accept one; read them on the portal before you apply anywhere.
+      source: placement
+      last_verified:
+    - q: Can I take an internship found off-campus (LinkedIn, a company site, a prof)?
+      a: |
+        Yes, many students do. If you are also registered in the institute process, check the placement rules
+        first; accepting one offer can affect your eligibility for the other. Record how you found it when you
+        [write it up](/experiences/), because juniors need the channel.
+      source: placement
+      last_verified:
+    - q: What is a PIO (pre-internship offer)?
+      a: |
+        Some in-sem programmes and competitions (for example the bank and consulting programmes on the
+        [Radar](/radar/)) end with an internship offer, made *before* the regular intern season. Accepting a PIO can
+        affect your participation in the institute process, so read the placement rules before you accept.
+      source: placement
+      last_verified:
+
+- id: projects
+  topic: SLP and BTP
+  items:
+    - q: What is an SLP, and does it count towards my degree?
+      a: |
+        A Supervised Learning Project (SLP) is a project with a professor, taken for credits in a regular
+        semester. Whether its credits count towards degree requirements or appear as additional learning depends
+        on the rules, so check before you count on it to fill an elective slot.
+      source: ugrules
+      last_verified:
+    - q: What is a BTP?
+      a: |
+        The B.Tech Project is the final-year project, usually over one or two semesters, with an IEOR faculty
+        guide. Our first B.Tech batch will reach BTP in 2027-28; until then, the department's M.Tech projects are
+        the closest guide to what IEOR projects look like.
+      source: dept
+      last_verified:
+    - q: How and when do I find an SLP or BTP guide?
+      a: |
+        Start one or two months before the semester you want to work in. Read the faculty pages, pick two or three
+        profs whose work interests you, and read one recent paper or course page of each. Then email each one
+        separately: who you are, relevant courses, what interested you in their work, and your CV. Office hours work
+        better than a second email. See the [Radar entry](/radar/) for the usual months.
+      source: dept
+      last_verified:

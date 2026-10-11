@@ -1,0 +1,22 @@
+# Course categories, explained on the Courses page the way EP DAMP does it.
+# Wording is deliberately general; the UG rules are the source of truth.
+- key: core
+  name: Core
+  what: Compulsory courses of the IEOR B.Tech. Everyone in the batch takes them, in a fixed semester.
+  tip: You cannot drop a core course. A failed core course has to be cleared later, usually when it is next offered.
+- key: DE
+  name: Department elective (DE)
+  what: Electives offered by the IEOR department that count towards your B.Tech elective credits.
+  tip: Check prerequisites early. Some DEs are offered only in one semester, or not every year.
+- key: IE
+  name: Institute elective (IE)
+  what: Courses from other departments (or IEOR courses outside your DE list) that count as institute electives.
+  tip: Many IEOR students use IE slots for MA, SI, CS, DS and MG courses. A course's tag can sometimes be changed later (retagging); see the FAQs.
+- key: minor
+  name: Minor
+  what: A set of courses from another department that earns a minor if you complete the required credits.
+  tip: Minor courses are additional to your degree requirements. Application windows are fixed; see the FAQs.
+- key: honours
+  name: Honours
+  what: Additional advanced IEOR courses that earn "Honours" in IEOR, subject to CPI conditions.
+  tip: Honours rules for the 2024 and later batches must be confirmed with the department office.

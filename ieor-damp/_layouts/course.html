@@ -1,0 +1,56 @@
+---
+layout: default
+---
+{%- assign tl = site.data.tags -%}
+{%- assign reviews = site.posts | where: "type", "course-review" | where_exp: "p", "p.course contains page.code" -%}
+{%- assign running = false -%}{%- if page.running contains site.current_semester -%}{%- assign running = true -%}{%- endif -%}
+<nav class="crumbs" aria-label="Breadcrumb"><a href="{{ '/courses/' | relative_url }}">← Courses</a></nav>
+<header class="page-head">
+  <p class="eyebrow">{{ tl.category[page.category] | default: page.category }}{% if page.offered %} · usually {{ page.offered }}{% endif %}</p>
+  <h1>{{ page.code }} · {{ page.name }}</h1>
+  <p class="chips">
+    {% if running %}<span class="chip chip-ok">Running this semester ({{ site.current_semester }})</span>{% endif %}
+    <span class="chip">{{ reviews.size }} review{% if reviews.size != 1 %}s{% endif %}</span>
+    {% if page.credits %}<span class="chip">{{ page.credits }} credits</span>{% endif %}
+  </p>
+</header>
+
+{%- assign body = content | strip -%}
+{% if body != "" %}<div class="prose">{{ content }}</div>{% endif %}
+
+{% if reviews.size > 1 %}
+{%- assign dsum = 0 -%}{%- assign dn = 0 -%}{%- assign wsum = 0 -%}{%- assign wn = 0 -%}
+{%- for r in reviews -%}
+  {%- if r.difficulty -%}{%- assign dsum = dsum | plus: r.difficulty -%}{%- assign dn = dn | plus: 1 -%}{%- endif -%}
+  {%- if r.workload_hours_per_week -%}{%- assign wsum = wsum | plus: r.workload_hours_per_week -%}{%- assign wn = wn | plus: 1 -%}{%- endif -%}
+{%- endfor -%}
+<section class="compare">
+  <h2>Reviews side by side</h2>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Semester</th><th>Instructor</th><th>Workload (h/week)</th><th>Difficulty</th><th>Grading</th></tr></thead>
+    <tbody>
+    {% for r in reviews %}<tr><td><a href="#{{ r.slug }}">{{ r.semester }}</a></td><td>{{ r.instructor }}</td><td>{{ r.workload_hours_per_week }}</td><td>{{ r.difficulty }}/5</td><td>{{ r.grading }}</td></tr>{% endfor %}
+    </tbody>
+    <tfoot><tr><th colspan="2">Average</th><td>{% if wn > 0 %}{{ wsum | times: 1.0 | divided_by: wn | round: 1 }}{% endif %}</td><td>{% if dn > 0 %}{{ dsum | times: 1.0 | divided_by: dn | round: 1 }}/5{% endif %}</td><td></td></tr></tfoot>
+  </table>
+  </div>
+</section>
+{% endif %}
+
+<section class="reviews">
+  <h2>Reviews, newest first</h2>
+  {% for r in reviews %}
+  <article class="review-block" id="{{ r.slug }}">
+    <h3><a href="{{ r.url | relative_url }}">{{ r.title }}</a></h3>
+    <p class="muted small">{% if r.anonymous %}Anonymous{% else %}{{ r.author }}{% endif %}{% if r.author_year %} · {{ tl.author_year[r.author_year] | default: r.author_year }}{% endif %} · posted {{ r.date | date: "%-d %b %Y" }}{% if r.sample %} · <span class="chip chip-warn">Sample</span>{% endif %}</p>
+    {% include review-header.html p=r %}
+    <p><a class="btn btn-ghost" href="{{ r.url | relative_url }}">Read the full review →</a></p>
+  </article>
+  {% else %}
+  <div class="callout">
+    <p><strong>No review yet.</strong> Took {{ page.code }}? A review takes about 20 minutes and helps every batch after you. <a href="{{ '/team/#ask' | relative_url }}">Tell us</a> and we'll send you the template.</p>
+  </div>
+  {% endfor %}
+</section>
+{% unless page.last_verified %}<p class="muted small">Course details on this page (code, name, usual semester) have not been checked against the current curriculum yet.</p>{% endunless %}

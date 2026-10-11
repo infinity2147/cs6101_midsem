@@ -1,0 +1,30 @@
+# Official sources. The site never becomes the source of truth: every rule and
+# FAQ links to one of these. Check each link during the yearly freshness pass.
+quick:
+  - name: IEOR department
+    url: https://www.ieor.iitb.ac.in/
+    note: Official programme page, faculty, curriculum
+  - name: ASC (Academic Software Centre)
+    url: https://asc.iitb.ac.in/
+    note: Registration, timetable, grades
+  - name: Academic office
+    url: https://www.iitb.ac.in/newacadhome/
+    note: Academic calendar, UG rules, forms
+  - name: Academic calendar
+    url: https://www.iitb.ac.in/newacadhome/toacadcalender.jsp
+    note: Registration, add/drop and exam dates
+  - name: Timetable and slots
+    url: https://www.iitb.ac.in/newacadhome/timetable.jsp
+    note: Slot chart for the semester
+  - name: SMP (Student Mentor Programme)
+    url: https://smp.gymkhana.iitb.ac.in/
+    note: DAMP is SMP's academic mentorship wing
+
+official:
+  dept: https://www.ieor.iitb.ac.in/
+  acad: https://www.iitb.ac.in/newacadhome/
+  ugrules: https://www.iitb.ac.in/newacadhome/rules.jsp
+  asc: https://asc.iitb.ac.in/
+  ir: https://ir.iitb.ac.in/
+  placement: https://placements.iitb.ac.in/
+  smp: https://smp.gymkhana.iitb.ac.in/

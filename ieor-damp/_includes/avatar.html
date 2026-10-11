@@ -1,0 +1,8 @@
+{%- comment -%} Params: name, photo, size (sm|md) {%- endcomment -%}
+{%- assign words = include.name | default: "Anonymous" | split: " " -%}
+{%- capture initials -%}{{ words[0] | slice: 0 }}{% if words.size > 1 %}{{ words.last | slice: 0 }}{% endif %}{%- endcapture -%}
+{%- if include.photo and include.photo != "" -%}
+<img class="avatar {{ include.size | default: 'sm' }}" src="{{ include.photo | relative_url }}" alt="" loading="lazy">
+{%- else -%}
+<span class="avatar {{ include.size | default: 'sm' }}" aria-hidden="true">{{ initials | upcase }}</span>
+{%- endif -%}

@@ -1,0 +1,16 @@
+{%- comment -%} One radar entry card (F4 list view). Param: r {%- endcomment -%}
+{%- assign r = include.r -%}
+{%- assign tl = site.data.tags -%}
+<article class="card radar-card" data-kind="{{ r.kind }}" data-stage="{{ r.roadmap | join: '|' }}" data-tags="{{ r.tags | join: '|' }}">
+  <div class="post-card-top">
+    <span class="chip chip-type">{{ tl.kind[r.kind] | default: r.kind }}</span>
+    <span class="chip chip-when" title="Usual application window">{{ r.opens }}{% if r.closes and r.closes != r.opens %} – {{ r.closes }}{% endif %}</span>
+    {% unless r.last_verified %}<span class="chip chip-warn" title="Months are an estimate until the team verifies them">Unverified</span>{% endunless %}
+  </div>
+  <h3 class="post-card-title"><a href="{{ r.url | relative_url }}">{{ r.name | default: r.title }}</a></h3>
+  <p class="muted small">{{ r.organiser }}</p>
+  <dl class="mini">
+    <div><dt>Who can apply</dt><dd>{{ r.eligibility }}</dd></div>
+    <div><dt>Leads to</dt><dd>{{ r.leads_to }}</dd></div>
+  </dl>
+</article>

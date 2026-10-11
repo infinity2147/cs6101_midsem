@@ -1,0 +1,22 @@
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div>
+      <p class="footer-title">IEOR DAMP · IIT Bombay</p>
+      <p>Run by the {{ site.data.team.current.year }} IEOR DAMP team, part of the <a href="{{ site.data.links.official.smp }}">Student Mentor Programme</a>.</p>
+      <p class="muted">This site summarises; it is not the source of truth. Rules link to the official pages, and every answer shows when it was last checked.</p>
+    </div>
+    <div>
+      <p class="footer-title">Official links</p>
+      <ul class="plain">
+        {% for l in site.data.links.quick limit: 4 %}<li><a href="{{ l.url }}">{{ l.name }}</a></li>{% endfor %}
+      </ul>
+    </div>
+    <div>
+      <p class="footer-title">Talk to us</p>
+      <ul class="plain">
+        <li><a href="{{ '/team/#ask' | relative_url }}">Ask a question (anonymous allowed)</a></li>
+        {% if site.team_email %}<li><a href="mailto:{{ site.team_email }}">{{ site.team_email }}</a></li>{% endif %}
+      </ul>
+    </div>
+  </div>
+</footer>

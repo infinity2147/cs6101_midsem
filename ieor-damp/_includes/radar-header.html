@@ -1,0 +1,22 @@
+{%- comment -%} Required radar fields (F4). Param: p {%- endcomment -%}
+{%- assign p = include.p -%}
+{%- assign tl = site.data.tags -%}
+<div class="radar-header">
+  <div class="window">
+    <div><span class="label">Usually opens</span><strong>{{ p.opens | default: "?" }}</strong></div>
+    <span class="arrow" aria-hidden="true">→</span>
+    <div><span class="label">Usually closes</span><strong>{{ p.closes | default: "?" }}</strong></div>
+  </div>
+  <dl class="facts">
+    <div><dt>Organiser</dt><dd>{{ p.organiser }}</dd></div>
+    <div><dt>Type</dt><dd>{{ tl.kind[p.kind] | default: p.kind }}</dd></div>
+    <div class="wide"><dt>Who can apply</dt><dd>{{ p.eligibility }}</dd></div>
+    <div class="highlight"><dt>Announced through</dt><dd>{{ tl.channel[p.channel] | default: p.channel }}</dd></div>
+    <div><dt>When to look</dt><dd>{% for s in p.roadmap %}{{ tl.roadmap[s] | default: s }}{% unless forloop.last %}, {% endunless %}{% endfor %}</dd></div>
+    <div class="wide"><dt>Selection stages</dt><dd>{{ p.stages }}</dd></div>
+    <div class="wide"><dt>What helped</dt><dd>{{ p.what_helped | default: "Not recorded yet. If you applied, tell us." }}</dd></div>
+    <div class="wide"><dt>Leads to</dt><dd>{{ p.leads_to }}</dd></div>
+    {% if p.link %}<div class="wide"><dt>Official page</dt><dd><a href="{{ p.link }}">{{ p.link }}</a></dd></div>{% endif %}
+  </dl>
+  <p class="header-foot">{% include verified.html date=p.last_verified %}{% unless p.last_verified %} <span class="muted small">Months are the team's estimate; check the official announcement.</span>{% endunless %}</p>
+</div>

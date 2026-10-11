@@ -1,0 +1,68 @@
+---
+title: Opportunity Radar
+permalink: /radar/
+layout: default
+scripts: [/assets/js/radar.js]
+---
+{% include page-head.html eyebrow="The Guide" title="Opportunity Radar" lede="Programmes, pre-internship offers, research internships, competitions, scholarships and exchanges that IITB students actually get. Each entry has the months it usually opens and closes, who can apply, and the channel it is announced on." %}
+
+{%- assign entries = site.posts | where: "type", "radar" | sort: "name" -%}
+{%- assign tl = site.data.tags -%}
+{%- assign months = "January,February,March,April,May,June,July,August,September,October,November,December" | split: "," -%}
+
+<div class="callout warn" role="note">
+  <p><strong>Dates are usual months, not deadlines.</strong> Always confirm on the official announcement. Entries marked <span class="chip chip-warn">Unverified</span> have months the team has not yet checked.</p>
+</div>
+
+<div class="tabs" role="tablist" aria-label="Radar views">
+  <button role="tab" id="tab-list" aria-controls="view-list" aria-selected="true" data-view="list">List</button>
+  <button role="tab" id="tab-calendar" aria-controls="view-calendar" aria-selected="false" data-view="calendar">Calendar</button>
+  <button role="tab" id="tab-roadmap" aria-controls="view-roadmap" aria-selected="false" data-view="roadmap">Year roadmap</button>
+</div>
+
+<section id="view-list" role="tabpanel" aria-labelledby="tab-list" data-panel="list">
+  <form class="filter-bar" data-radar-filter onsubmit="return false" aria-label="Filter opportunities">
+    <label><span>Type</span><select data-dim="kind"><option value="">All types</option>{% for k in tl.kind %}<option value="{{ k[0] }}">{{ k[1] }}</option>{% endfor %}</select></label>
+    <label><span>When to look</span><select data-dim="stage"><option value="">Any year</option>{% for s in tl.roadmap %}<option value="{{ s[0] }}">{{ s[1] }}</option>{% endfor %}</select></label>
+    <div class="filter-status"><span class="muted" data-count aria-live="polite">{{ entries.size }} opportunities</span></div>
+  </form>
+  <div class="grid cards-2" data-radar-cards>
+    {% for r in entries %}{% include radar-card.html r=r %}{% endfor %}
+  </div>
+  <p class="empty" data-empty hidden>No entries match. Try another filter.</p>
+</section>
+
+<section id="view-calendar" role="tabpanel" aria-labelledby="tab-calendar" data-panel="calendar" hidden>
+  <p class="muted">What opens and what closes, month by month. The current month is highlighted.</p>
+  <div class="calendar">
+    {% for m in months %}
+    {%- assign opening = entries | where: "opens", m -%}
+    {%- assign closing = entries | where: "closes", m -%}
+    <div class="month card" data-month="{{ forloop.index0 }}">
+      <h3>{{ m }}</h3>
+      {% if opening.size > 0 %}<p class="label">Opens</p><ul class="plain">{% for r in opening %}<li><a href="{{ r.url | relative_url }}">{{ r.name }}</a></li>{% endfor %}</ul>{% endif %}
+      {% if closing.size > 0 %}<p class="label">Closes</p><ul class="plain">{% for r in closing %}<li><a href="{{ r.url | relative_url }}">{{ r.name }}</a></li>{% endfor %}</ul>{% endif %}
+      {% if opening.size == 0 and closing.size == 0 %}<p class="muted small">Nothing opens or closes.</p>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section id="view-roadmap" role="tabpanel" aria-labelledby="tab-roadmap" data-panel="roadmap" hidden>
+  <p class="muted">What to look at in each year. Most programmes are announced a semester before they run, so apply one stage ahead.</p>
+  <ol class="roadmap">
+    {% for s in tl.roadmap %}
+    {%- assign here = "" | split: "" -%}
+    {%- for r in entries -%}{%- if r.roadmap contains s[0] -%}{%- assign here = here | push: r -%}{%- endif -%}{%- endfor -%}
+    <li class="roadmap-stage">
+      <h3>{{ s[1] }}</h3>
+      {% if here.size > 0 %}
+      <ul class="link-list">{% for r in here %}<li><a href="{{ r.url | relative_url }}">{{ r.name }}</a> <span class="muted small">{{ tl.kind[r.kind] }} · {{ r.opens }}{% if r.closes != r.opens %}–{{ r.closes }}{% endif %}</span></li>{% endfor %}</ul>
+      {% else %}<p class="muted small">Nothing listed yet.</p>{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+
+<p class="muted small after-panels">Know an opportunity that is missing? <a href="{{ '/team/#ask' | relative_url }}">Tell us</a>, including where it was announced.</p>
+{% include radar-data.html %}

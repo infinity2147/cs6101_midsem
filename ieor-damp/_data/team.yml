@@ -1,0 +1,32 @@
+# Current and past teams (F6). Update every year at handover (README, "Handover").
+# photo: path under /assets/img/team/ (square, ~400px) or leave empty for initials.
+current:
+  year: 2026-27
+  members:
+    - name: Person 1            # TODO: real name
+      role: Tech and design
+      year: 3rd year, IEOR B.Tech
+      interests: Web, optimization, analytics
+      email: ""                 # @iitb.ac.in address, with consent
+      photo: ""
+    - name: Person 2
+      role: Content and academics
+      year: 3rd year, IEOR B.Tech
+      interests: Course planning, statistics, supply chain
+      email: ""
+      photo: ""
+    - name: Person 3
+      role: Outreach and opportunities
+      year: 3rd year, IEOR B.Tech
+      interests: Internships, consulting, quant
+      email: ""
+      photo: ""
+  faculty_coordinator:
+    name: ""                    # TODO: confirm with the department
+    email: ""
+
+# Newest first. 2026-27 is the founding team, so this is empty for now.
+past: []
+#  - year: 2027-28
+#    members:
+#      - { name: ..., role: ..., year: ... }

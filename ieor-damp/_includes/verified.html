@@ -1,0 +1,6 @@
+{%- comment -%} Last-verified line. Param: date (may be empty) {%- endcomment -%}
+{%- if include.date -%}
+<span class="verified" title="When a team member last checked this against the official source or the author">Last verified {{ include.date | date: "%-d %b %Y" }}</span>
+{%- else -%}
+<span class="verified unverified" title="Nobody on the team has checked this yet">Not yet verified</span>
+{%- endif -%}

@@ -1,0 +1,25 @@
+{%- comment -%} One post card (F1). Param: post {%- endcomment -%}
+{%- assign p = include.post -%}
+{%- assign tl = site.data.tags -%}
+{%- if p.anonymous -%}{%- assign who = "Anonymous" -%}{%- else -%}{%- assign who = p.author | default: "Anonymous" -%}{%- endif -%}
+<article class="card post-card"
+  data-type="{{ p.type }}"
+  data-domain="{{ p.domain }}"
+  data-year="{{ p.author_year }}"
+  data-program="{{ p.author_program }}"
+  data-tags="{{ p.tags | join: '|' }}{% if p.org %}|{{ p.org }}{% endif %}{% if p.course %}|{{ p.course | split: ' - ' | first }}{% endif %}">
+  <div class="post-card-top">
+    <span class="chip chip-type">{{ tl.type[p.type] | default: p.type }}</span>
+    {% if p.domain %}<span class="chip">{{ tl.domain[p.domain] | default: p.domain }}</span>{% endif %}
+    {% if p.sample %}<span class="chip chip-warn">Sample</span>{% endif %}
+  </div>
+  <h3 class="post-card-title"><a href="{{ p.url | relative_url }}">{{ p.title }}</a></h3>
+  {% if p.summary %}<p class="post-card-summary">{{ p.summary }}</p>{% endif %}
+  <div class="byline">
+    {% unless p.anonymous %}{% include avatar.html name=who photo=p.photo %}{% endunless %}
+    <span>
+      <span class="byline-name">{{ who }}</span>{% if p.author_year %} · {{ tl.author_year[p.author_year] | default: p.author_year }}{% endif %}{% if p.author_program %}, {{ p.author_program }}{% endif %}<br>
+      <time datetime="{{ p.date | date_to_xmlschema }}" class="muted">{{ p.date | date: "%-d %b %Y" }}</time>
+    </span>
+  </div>
+</article>

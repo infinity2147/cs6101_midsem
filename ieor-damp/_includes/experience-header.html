@@ -1,0 +1,18 @@
+{%- comment -%} Fact strip that opens every experience post (F1, F4). Param: p {%- endcomment -%}
+{%- assign p = include.p -%}
+{%- assign tl = site.data.tags -%}
+<div class="exp-header">
+  <p class="exp-opening">
+    {% if p.anonymous %}Written anonymously{% else %}Written by <strong>{{ p.author }}</strong>{% endif %},
+    {% if p.author_year %}{{ tl.author_year[p.author_year] | default: p.author_year | downcase }}{% endif %}{% if p.author_program %} ({{ p.author_program }}){% endif %}
+    {% if p.when_done %}· did this <strong>{{ p.when_done }}</strong>{% endif %}
+  </p>
+  <dl class="facts">
+    {% if p.org %}<div><dt>Organisation</dt><dd>{{ p.org }}</dd></div>{% endif %}
+    {% if p.role %}<div><dt>Role</dt><dd>{{ p.role }}</dd></div>{% endif %}
+    {% if p.domain %}<div><dt>Domain</dt><dd>{{ tl.domain[p.domain] | default: p.domain }}</dd></div>{% endif %}
+    <div class="highlight"><dt>Found it through</dt><dd>{{ tl.channel[p.channel] | default: p.channel | default: "Not recorded" }}</dd></div>
+    {% if p.cpi_band %}<div><dt>CPI band</dt><dd>{{ p.cpi_band }}</dd></div>{% endif %}
+    {% if p.radar %}{% assign r = site.posts | where: "slug", p.radar | first %}{% if r %}<div><dt>Radar entry</dt><dd><a href="{{ r.url | relative_url }}">{{ r.name | default: r.title }}</a></dd></div>{% endif %}{% endif %}
+  </dl>
+</div>

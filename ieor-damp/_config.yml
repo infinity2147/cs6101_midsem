@@ -1,0 +1,70 @@
+# IEOR DAMP website (Version 1)
+# Run locally: bundle exec jekyll serve  (see README.md)
+
+title: IEOR DAMP
+tagline: What your seniors know about IEOR courses, rules and opportunities, before you need it.
+description: >-
+  The Department Academic Mentorship Programme (DAMP) site for IEOR students at IIT Bombay:
+  course reviews, course tracks, an opportunity calendar, experiences, rules and FAQs.
+url: ""          # e.g. https://ieor-damp.github.io (set when the GitHub organisation exists)
+baseurl: ""      # GitHub Actions passes the right value at build time
+
+# Team contact. Owned by the DAMP team email, not a personal one.
+team_email: ieor.damp@example.com   # TODO: replace with the real team address
+
+# Semester shown by the "Running this semester" badge on course pages.
+current_semester: Autumn 2026
+
+# Ask us form (F6). Create a Google Form owned by the team email with four
+# short-answer/paragraph questions, then copy the form's "formResponse" URL and
+# each question's entry id here (get them from "Get pre-filled link").
+# While `action` is empty, the form opens an email to team_email instead.
+ask_form:
+  action: ""                 # https://docs.google.com/forms/d/e/<FORM_ID>/formResponse
+  entries:
+    name: ""                 # entry.123456789
+    contact: ""
+    year: ""
+    question: ""
+
+timezone: Asia/Kolkata
+
+collections:
+  courses:
+    output: true
+    permalink: /courses/:name/
+
+defaults:
+  - scope: { path: "", type: posts }
+    values:
+      layout: post
+      permalink: /posts/:year/:title/
+  - scope: { path: "_posts/radar", type: posts }
+    values:
+      layout: post
+      type: radar
+      permalink: /radar/:title/
+  - scope: { path: "", type: courses }
+    values:
+      layout: course
+  - scope: { path: "pages/tracks" }
+    values:
+      layout: track
+  - scope: { path: "pages" }
+    values:
+      layout: page
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  auto_ids: true
+
+exclude:
+  - README.md
+  - CONTRIBUTING.md
+  - Gemfile
+  - Gemfile.lock
+  - scripts/
+  - templates/
+  - vendor/
+  - .github/

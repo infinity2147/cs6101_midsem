@@ -1,0 +1,97 @@
+# The official tag list. ONE team member owns this file (spec section 9).
+# Add a new value here before using it in a post; scripts/check_posts.rb
+# rejects any value that is not listed. Keys are what goes in front matter,
+# labels are what readers see.
+
+type:
+  course-review: Course review
+  internship: Internship
+  research: Research internship
+  in-sem: In-sem programme
+  semex: Semester exchange
+  gyan: Gyan
+  radar: Radar entry
+  # Reserved for later versions (not shown in Version 1 navigation):
+  ug-project: UG project
+  further-studies: Further studies
+  event: Event notes
+  didnt-work: What didn't work
+
+domain:
+  or-optimization: OR and optimization
+  supply-chain-ops: Supply chain and operations
+  analytics-ds: Analytics and data science
+  quant-finance: Quant finance
+  consulting: Consulting
+  product: Product
+  research: Research
+  core-industry: Core industry
+
+author_year:
+  1st: 1st year
+  2nd: 2nd year
+  3rd: 3rd year
+  4th: 4th year
+  DD: Dual degree
+  M.Tech: M.Tech
+  PhD: PhD
+  alum: Alum
+
+author_program:
+  IEOR B.Tech: IEOR B.Tech
+  IEOR minor: IEOR minor
+  IEOR M.Tech: IEOR M.Tech
+  IEOR PhD: IEOR PhD
+  other branch: Other branch
+
+# Opportunity Radar (F4)
+kind:
+  PIO: Pre-internship offer
+  programme: Programme / mentorship
+  research: Research internship
+  competition: Competition
+  scholarship: Scholarship
+  semex: Semester exchange
+
+channel:
+  portal: Placement portal
+  webmail: Webmail announcement
+  LinkedIn: LinkedIn
+  company site: Company website
+  prof email: Prof email
+  IR office: International Relations office
+  dept: Department announcement
+  word of mouth: Seniors / word of mouth
+
+# Course categories (F2). Explained on the Courses page.
+category:
+  core: Core
+  DE: Department elective
+  IE: Institute elective
+  minor: Minor
+  honours: Honours
+
+# Year roadmap stages for radar entries
+roadmap:
+  1st-summer: Summer after 1st year
+  2nd: 2nd year
+  3rd: 3rd year
+  4th: 4th year
+
+# Free tags (the `tags:` list in a post). Keep this short.
+tags:
+  - women-only
+  - pio
+  - ppi
+  - abroad
+  - stipend
+  - coding
+  - case-study
+  - probability
+  - optimization
+  - statistics
+  - excel
+  - python
+  - sql
+  - asc
+  - registration

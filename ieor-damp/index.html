@@ -1,0 +1,69 @@
+---
+layout: default
+body_class: home
+scripts: [/assets/js/radar.js]
+---
+<section class="hero">
+  <p class="eyebrow">Department Academic Mentorship Programme · IEOR, IIT Bombay</p>
+  <h1>What your seniors know about IEOR, before you need it.</h1>
+  <p class="lede">Course reviews, course plans, opportunity deadlines and rules, written by IEOR students and the seniors we borrow from M.Tech, PhD and other branches. If you are struggling with a course, start with <a href="{{ '/team/#ask' | relative_url }}">Ask us</a>.</p>
+</section>
+
+<section class="home-group" aria-labelledby="guide-h">
+  <div class="group-head">
+    <h2 id="guide-h">The Guide</h2>
+    <p class="muted">What to take, when to apply, and what the people ahead of you did.</p>
+  </div>
+  <div class="grid cards-4">{% for item in site.data.nav.guide %}{% include section-card.html item=item %}{% endfor %}</div>
+</section>
+
+<section class="home-group" aria-labelledby="room-h">
+  <div class="group-head">
+    <h2 id="room-h">The Common Room</h2>
+    <p class="muted">Rules, answers and the people you can talk to.</p>
+  </div>
+  <div class="grid cards-2">{% for item in site.data.nav.common_room %}{% include section-card.html item=item %}{% endfor %}</div>
+</section>
+
+<section class="open-now" aria-labelledby="open-h">
+  <div class="group-head">
+    <h2 id="open-h">Open now <span class="muted" data-month-label></span></h2>
+    <a href="{{ '/radar/?view=calendar' | relative_url }}">Full calendar →</a>
+  </div>
+  <div class="strip" data-open-now><p class="muted">Loading the Radar…</p></div>
+  <noscript><p class="muted">Turn on JavaScript to see what is open this month, or browse the <a href="{{ '/radar/' | relative_url }}">full Radar</a>.</p></noscript>
+</section>
+
+<div class="split">
+  <section aria-labelledby="latest-h">
+    <div class="group-head"><h2 id="latest-h">Latest posts</h2><a href="{{ '/posts/' | relative_url }}">All posts →</a></div>
+    <ol class="latest">
+      {%- assign n = 0 -%}
+      {%- for p in site.posts -%}
+        {%- if p.type == "radar" -%}{%- continue -%}{%- endif -%}
+        {%- if n >= 5 -%}{%- break -%}{%- endif -%}
+        <li>
+          <a href="{{ p.url | relative_url }}">{{ p.title }}</a>
+          <span class="muted small">{{ site.data.tags.type[p.type] | default: p.type }} · {% if p.anonymous %}Anonymous{% else %}{{ p.author }}{% endif %} · {{ p.date | date: "%-d %b %Y" }}{% if p.sample %} · Sample{% endif %}</span>
+        </li>
+        {%- assign n = n | plus: 1 -%}
+      {%- endfor -%}
+    </ol>
+  </section>
+  <section aria-labelledby="links-h">
+    <div class="group-head"><h2 id="links-h">Quick links</h2></div>
+    <ul class="quick-links">
+      {% for l in site.data.links.quick %}<li><a href="{{ l.url }}">{{ l.name }}<span class="muted small">{{ l.note }}</span></a></li>{% endfor %}
+    </ul>
+  </section>
+</div>
+
+<section class="home-ask" aria-labelledby="ask-h">
+  <div class="group-head">
+    <h2 id="ask-h">Ask us</h2>
+    <p class="muted">No question is too small. Tick "anonymous" if you'd rather not say who you are.</p>
+  </div>
+  {% include ask-form.html %}
+</section>
+
+{% include radar-data.html %}

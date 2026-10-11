@@ -1,0 +1,15 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% if page.title %}{% assign t = page.title | append: " · " | append: site.title %}{% else %}{% assign t = site.title | append: " · IIT Bombay" %}{% endif %}
+<title>{{ t | strip_html }}</title>
+<meta name="description" content="{{ page.description | default: page.summary | default: site.description | strip_html | normalize_whitespace | truncate: 160 }}">
+<link rel="icon" href="{{ '/assets/img/favicon.svg' | relative_url }}" type="image/svg+xml">
+<script>
+  /* Set the theme before first paint. Storage can be blocked, so guard it. */
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('theme'); } catch (e) {}
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">

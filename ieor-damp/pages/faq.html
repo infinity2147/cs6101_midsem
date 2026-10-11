@@ -1,0 +1,37 @@
+---
+title: Rules and FAQs
+permalink: /faq/
+layout: default
+---
+{% include page-head.html eyebrow="The Common Room" title="Rules and FAQs" lede="Short answers to the questions IEOR students actually ask. Each one links to the official rule and says when it was last checked. If the official page disagrees with us, the official page wins." %}
+{%- assign base_link = "](" | append: site.baseurl | append: "/" -%}
+{%- assign src_names = "dept:IEOR department,acad:Academic office,ugrules:UG rules,asc:ASC,ir:International Relations office,placement:Placement Office,smp:SMP" | split: "," -%}
+
+<nav class="topic-nav" aria-label="FAQ topics">
+  {% for t in site.data.faqs %}<a class="chip" href="#{{ t.id }}">{{ t.topic }} <span class="muted">{{ t.items.size }}</span></a>{% endfor %}
+</nav>
+
+{% for t in site.data.faqs %}
+<section class="faq-topic" id="{{ t.id }}" aria-labelledby="{{ t.id }}-h">
+  <h2 id="{{ t.id }}-h">{{ t.topic }}</h2>
+  {% for item in t.items %}
+  {%- assign src_url = site.data.links.official[item.source] -%}
+  {%- assign src_name = item.source -%}
+  {%- for pair in src_names -%}{%- assign kv = pair | split: ":" -%}{%- if kv[0] == item.source -%}{%- assign src_name = kv[1] -%}{%- endif -%}{%- endfor -%}
+  <details class="faq" id="{{ t.id }}-{{ forloop.index }}">
+    <summary>{{ item.q }}</summary>
+    <div class="faq-body">
+      {{ item.a | replace: "](/", base_link | markdownify }}
+      <p class="faq-meta">
+        <a href="{{ src_url }}">Official source: {{ src_name }}</a>
+        · {% include verified.html date=item.last_verified %}
+      </p>
+    </div>
+  </details>
+  {% endfor %}
+</section>
+{% endfor %}
+
+<div class="callout">
+  <p><strong>Your question isn't here?</strong> <a href="{{ '/team/#ask' | relative_url }}">Ask us</a>. Questions we get often become FAQs.</p>
+</div>

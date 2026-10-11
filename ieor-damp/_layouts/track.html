@@ -1,0 +1,35 @@
+---
+layout: default
+---
+{%- assign tl = site.data.tags -%}
+<nav class="crumbs" aria-label="Breadcrumb"><a href="{{ '/tracks/' | relative_url }}">← Course Tracks</a></nav>
+<header class="page-head">
+  <p class="eyebrow">Course Track{% for d in page.domains %} · {{ tl.domain[d] | default: d }}{% endfor %}</p>
+  <h1>{{ page.title }}</h1>
+  {% if page.lede %}<p class="lede">{{ page.lede }}</p>{% endif %}
+  <p>{% include verified.html date=page.last_verified %}{% if page.checked_by %} <span class="muted small">· checked by {{ page.checked_by }}</span>{% endif %}</p>
+</header>
+{% if page.status == "draft" %}
+<div class="callout warn" role="note"><strong>Draft.</strong> Written by the team and not yet checked by a senior who followed a similar path. Course codes and semesters must be confirmed against the current IEOR curriculum before you plan around them.</div>
+{% endif %}
+
+<div class="prose">
+{{ content }}
+</div>
+
+{% if page.domains %}
+{%- assign related = "" | split: "" -%}
+{%- for p in site.posts -%}{%- if p.type != "radar" and page.domains contains p.domain -%}{%- assign related = related | push: p -%}{%- endif -%}{%- endfor -%}
+<section class="related">
+  <h2>Related posts</h2>
+  {% if related.size > 0 %}
+  <div class="grid cards-2">{% for p in related limit: 6 %}{% include post-card.html post=p %}{% endfor %}</div>
+  {% else %}<p class="muted">No posts in this domain yet.</p>{% endif %}
+  {%- assign rel_radar = "" | split: "" -%}
+  {%- for r in site.posts -%}{%- if r.type == "radar" and page.domains contains r.domain -%}{%- assign rel_radar = rel_radar | push: r -%}{%- endif -%}{%- endfor -%}
+  {% if rel_radar.size > 0 %}
+  <h3>Opportunities on the Radar for this track</h3>
+  <ul class="link-list">{% for r in rel_radar %}<li><a href="{{ r.url | relative_url }}">{{ r.name }}</a> <span class="muted small">· {{ r.opens }}{% if r.closes != r.opens %}–{{ r.closes }}{% endif %}</span></li>{% endfor %}</ul>
+  {% endif %}
+</section>
+{% endif %}

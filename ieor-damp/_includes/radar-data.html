@@ -1,0 +1,21 @@
+{%- comment -%} All radar entries as JSON for the calendar, roadmap and "Open now" strip (F4). {%- endcomment -%}
+{%- assign entries = site.posts | where: "type", "radar" -%}
+<script>
+window.RADAR = [
+{%- for r in entries -%}
+  {
+    "name": {{ r.name | default: r.title | jsonify }},
+    "url": {{ r.url | relative_url | jsonify }},
+    "organiser": {{ r.organiser | jsonify }},
+    "kind": {{ r.kind | jsonify }},
+    "kindLabel": {{ site.data.tags.kind[r.kind] | default: r.kind | jsonify }},
+    "eligibility": {{ r.eligibility | jsonify }},
+    "opens": {{ r.opens | jsonify }},
+    "closes": {{ r.closes | jsonify }},
+    "roadmap": {{ r.roadmap | jsonify }},
+    "leadsTo": {{ r.leads_to | jsonify }},
+    "verified": {{ r.last_verified | jsonify }}
+  }{% unless forloop.last %},{% endunless %}
+{%- endfor -%}
+];
+</script>

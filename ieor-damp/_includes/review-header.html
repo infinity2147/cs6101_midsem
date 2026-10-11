@@ -1,0 +1,21 @@
+{%- comment -%} Structured course-review header (F2). Param: p (a course-review post) {%- endcomment -%}
+{%- assign p = include.p -%}
+{%- assign code = p.course | split: " - " | first | strip -%}
+{%- assign course_page = site.courses | where: "code", code | first -%}
+<div class="review-header">
+  <dl class="facts">
+    <div><dt>Course</dt><dd>{% if course_page %}<a href="{{ course_page.url | relative_url }}">{{ p.course }}</a>{% else %}{{ p.course }}{% endif %}</dd></div>
+    <div><dt>Instructor</dt><dd>{{ p.instructor | default: "—" }}</dd></div>
+    <div><dt>Semester taken</dt><dd>{{ p.semester | default: "—" }}</dd></div>
+    <div><dt>Category</dt><dd>{{ site.data.tags.category[p.category] | default: p.category | default: "—" }}</dd></div>
+    <div><dt>Workload</dt><dd>{% if p.workload_hours_per_week %}{{ p.workload_hours_per_week }} hours/week{% else %}—{% endif %}</dd></div>
+    <div><dt>Difficulty</dt><dd>{% if p.difficulty %}{% include difficulty.html value=p.difficulty %}{% else %}—{% endif %}</dd></div>
+    <div class="wide"><dt>Prerequisites (formal / what you actually need)</dt><dd>{{ p.prerequisites | default: "—" }}</dd></div>
+    <div class="wide"><dt>Grading</dt><dd>{{ p.grading | default: "—" }}</dd></div>
+  </dl>
+  <div class="take-skip">
+    <div class="take"><p class="label">Take it if</p><p>{{ p.take_it_if | default: "—" }}</p></div>
+    <div class="skip"><p class="label">Skip it if</p><p>{{ p.skip_it_if | default: "—" }}</p></div>
+  </div>
+  <p class="header-foot">{% include verified.html date=p.last_verified %}</p>
+</div>

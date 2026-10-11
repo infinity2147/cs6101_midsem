@@ -1,0 +1,45 @@
+---
+title: Team and Ask us
+permalink: /team/
+layout: default
+---
+{% include page-head.html eyebrow="The Common Room" title="Team and Ask us" lede="DAMP is SMP's academic mentorship wing for students from 2nd year onwards. We help with course planning and opportunities, and especially when a semester has gone badly. Talk to any of us." %}
+{%- assign team = site.data.team -%}
+
+<section aria-labelledby="team-h">
+  <h2 id="team-h">IEOR DAMP team {{ team.current.year }}</h2>
+  <div class="grid cards-3">
+    {% for m in team.current.members %}
+    <div class="card person">
+      {% include avatar.html name=m.name photo=m.photo size="lg" %}
+      <div>
+        <h3>{{ m.name }}</h3>
+        <p class="muted small">{{ m.role }} · {{ m.year }}</p>
+        {% if m.interests %}<p class="small">Ask me about: {{ m.interests }}</p>{% endif %}
+        {% if m.email != "" %}<p class="small"><a href="mailto:{{ m.email }}">{{ m.email }}</a></p>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% if team.current.faculty_coordinator.name != "" %}
+  <p>Faculty coordinator: <strong>{{ team.current.faculty_coordinator.name }}</strong>{% if team.current.faculty_coordinator.email != "" %} · <a href="mailto:{{ team.current.faculty_coordinator.email }}">{{ team.current.faculty_coordinator.email }}</a>{% endif %}</p>
+  {% endif %}
+</section>
+
+<section id="ask" aria-labelledby="ask-h2" class="ask-section">
+  <h2 id="ask-h2">Ask us</h2>
+  <p class="muted">Ask about anything: a course you are worried about, a backlog, a minor, an internship, a rule. Tick "anonymous" if you prefer; we answer anonymous questions on the FAQ page or at our next session. If something is urgent or about your wellbeing, please also reach out to <a href="{{ site.data.links.official.smp }}">SMP</a> or the institute's counselling services.</p>
+  {% include ask-form.html %}
+</section>
+
+<section aria-labelledby="past-h">
+  <h2 id="past-h">Past teams</h2>
+  {% if team.past.size > 0 %}
+    {% for t in team.past %}
+    <h3>{{ t.year }}</h3>
+    <ul class="plain">{% for m in t.members %}<li>{{ m.name }} · <span class="muted">{{ m.role }}</span></li>{% endfor %}</ul>
+    {% endfor %}
+  {% else %}
+  <p class="muted">The {{ team.current.year }} team is the first IEOR DAMP team. Past teams will be listed here from next year.</p>
+  {% endif %}
+</section>

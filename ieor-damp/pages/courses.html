@@ -1,0 +1,59 @@
+---
+title: Courses
+permalink: /courses/
+layout: default
+---
+{% include page-head.html eyebrow="The Guide" title="Courses" lede="One review per course per offering, each with the same header: workload, grading, difficulty, and who should take it or skip it. Read the newest review first and check its date." %}
+
+<section class="cat-explainer" aria-labelledby="cats-h">
+  <h2 id="cats-h">How course categories work</h2>
+  <p class="muted">Every course you register for carries a tag. The tag decides which credit requirement it counts towards. The <a href="{{ site.data.links.official.ugrules }}">UG rules</a> are the source of truth; see also the <a href="{{ '/faq/#credits' | relative_url }}">FAQs on credits and retagging</a>.</p>
+  <div class="grid cards-3">
+    {% for c in site.data.categories %}
+    <div class="card cat-card">
+      <h3><span class="chip chip-type">{{ c.key }}</span> {{ c.name }}</h3>
+      <p>{{ c.what }}</p>
+      <p class="muted small">{{ c.tip }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="callout warn" role="note">
+  <p><strong>Course list in progress.</strong> The electives below are IEOR courses that IITB students have reviewed before (codes from Mech DAMP's IEOR track). The full IEOR B.Tech core list is being added from the official curriculum. Until it is, check the <a href="{{ site.data.links.official.dept }}">IEOR department page</a> for your batch.</p>
+</div>
+
+{%- assign all_reviews = site.posts | where: "type", "course-review" -%}
+{%- assign groups = site.courses | sort: "order" | group_by: "group" -%}
+{% for g in groups %}
+<section class="course-group" aria-labelledby="g-{{ forloop.index }}">
+  <h2 id="g-{{ forloop.index }}">{{ g.name }}</h2>
+  <div class="table-scroll">
+  <table class="course-table">
+    <thead><tr><th scope="col">Course</th><th scope="col">Category</th><th scope="col">Reviews</th><th scope="col">Workload <span class="muted">h/week</span></th><th scope="col">Difficulty</th></tr></thead>
+    <tbody>
+    {% for c in g.items %}
+      {%- assign rs = all_reviews | where_exp: "p", "p.course contains c.code" -%}
+      {%- assign dsum = 0 -%}{%- assign dn = 0 -%}{%- assign wsum = 0 -%}{%- assign wn = 0 -%}
+      {%- for r in rs -%}
+        {%- if r.difficulty -%}{%- assign dsum = dsum | plus: r.difficulty -%}{%- assign dn = dn | plus: 1 -%}{%- endif -%}
+        {%- if r.workload_hours_per_week -%}{%- assign wsum = wsum | plus: r.workload_hours_per_week -%}{%- assign wn = wn | plus: 1 -%}{%- endif -%}
+      {%- endfor -%}
+      <tr>
+        <td><a href="{{ c.url | relative_url }}"><strong>{{ c.code }}</strong> {{ c.name }}</a>{% if c.running contains site.current_semester %} <span class="chip chip-ok">Running now</span>{% endif %}</td>
+        <td>{{ c.category }}</td>
+        <td>{% if rs.size > 0 %}{{ rs.size }}{% else %}<span class="muted">none yet</span>{% endif %}</td>
+        <td>{% if wn > 0 %}{{ wsum | times: 1.0 | divided_by: wn | round: 1 }}{% else %}<span class="muted">—</span>{% endif %}</td>
+        <td>{% if dn > 0 %}{{ dsum | times: 1.0 | divided_by: dn | round: 1 }}/5{% else %}<span class="muted">—</span>{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+{% endfor %}
+
+<section aria-labelledby="all-reviews-h">
+  <h2 id="all-reviews-h">All reviews</h2>
+  {% include post-stream.html types="course-review" filters="year,program" %}
+</section>
