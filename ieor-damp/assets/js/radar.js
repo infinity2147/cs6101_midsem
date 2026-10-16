@@ -84,7 +84,7 @@
         var q = new URLSearchParams(location.search);
         if (view === 'list') q.delete('view'); else q.set('view', view);
         var qs = q.toString();
-        history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
+        try { history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '')); } catch (e) {}
       }
       if (view === 'calendar') {
         var cur = document.querySelector('.month.current');
@@ -102,7 +102,7 @@
         }
       });
     });
-    var initial = new URLSearchParams(location.search).get('view');
+    var initial = new URLSearchParams(location.search).get('view') || location.hash.slice(1);
     show(['calendar', 'roadmap'].indexOf(initial) !== -1 ? initial : 'list', false);
 
     // Calendar: highlight the current month and start the grid from it.

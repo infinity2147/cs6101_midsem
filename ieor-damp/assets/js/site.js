@@ -121,7 +121,7 @@
           if (state[d]) q.set(d, state[d]); else q.delete(d);
         });
         var qs = q.toString();
-        history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
+        try { history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash); } catch (e) {}
       }
     }
     apply(false);
